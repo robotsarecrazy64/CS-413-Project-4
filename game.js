@@ -1,17 +1,27 @@
+GAME_WIDTH = 500;
+GAME_HEIGHT = 500;
+GAME_SCALE = 2;
 var gameport = document.getElementById("gameport");
 
-var renderer = PIXI.autoDetectRenderer(500, 500, {backgroundColor: 0x330033});
+var renderer = PIXI.autoDetectRenderer(GAME_WIDTH, 
+                                       GAME_HEIGHT, 
+                                       {backgroundColor: 0x330033});
 gameport.appendChild(renderer.view);
 
 PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST;
 
 PIXI.loader
   .add('gamefont.fnt')
-  .add("assets.json")
+  .add('assets/assets.json')
+  .add('assets/map.json')
+  .add('assets/tiles.png')
   .load(generateLevel);
 
 var battle_stage = new PIXI.Container();
 var game_stage = new PIXI.Container();
+game_stage.scale.x = GAME_SCALE;
+game_stage.scale.y = GAME_SCALE;
+
 var master_stage = new PIXI.Container();
 var player;
 var enemy;
@@ -25,14 +35,34 @@ var item_text;
 var step = 10;
 var count = 1;
 var battle_active = false;
+var world;
+var tu;
+
+const PLAYERMOVEAMOUNT = 25;
 const FIGHT = 1;
 const STEAL = 2;
 const ITEM = 3;
 const RUN = 4;
+
+const WKEY = 87;
+const AKEY = 65;
+const SKEY = 83;
+const DKEY = 68;
+const SPACE = 32;
+const SHIFT = 16;
+const ENTER = 13;
  
 function generateLevel() {
+   
+   // Initialize tile utilities
+   tu = new TileUtilities( PIXI );
+   world = tu.makeTiledWorld("assets/map.json", "assets/tiles.png");
+   game_stage.addChild(world);
+
 	
-	player = createSprite( 50, 200, 1, 1, "player1.png" );
+	player = createSprite( 50, 200, 1, 1, "rightarrow.png" );
+   //player.anchor.x = .5;
+   //player.anchor.y = .5;
 	game_stage.addChild( player );
 	
 	enemy = createMovieClip( 350, 200, 1, 1, "bat", 1, 2 );
@@ -73,16 +103,18 @@ function generateBattleMenu() {
 }
 
 function update() {
-  if(checkEnemyPlayerCollisions() ){
-			if ( count == 1 ) {
-				generateBattleMenu();
-				//alert("" + player.position.x);
-				count--;
-			}
+   if(checkEnemyPlayerCollisions() ){
+      if ( count == 1 ) {
+         generateBattleMenu();
+         //alert("" + player.position.x);
+         count--;
+      }
 	};	
 
-  requestAnimationFrame(update);
-  renderer.render(master_stage);
+   contain(player, {x: 0, y: 0, width: 1250, height: 1250});
+   requestAnimationFrame(update);
+   update_camera();
+   renderer.render(master_stage);
 }
 
 /**
@@ -171,55 +203,97 @@ var menu = StateMachine.create({
   }
 });
 
-function keydownEventHandler(event) {
- if ( !battle_active ) {
- 	 var temp_x = player.position.x;
-	 var temp_y = player.position.y;
-  
-  	if ( event.keyCode == 87 ) { // W key
-		// Update the player sprite to upper facing player
-		swapPlayer( temp_x, temp_y - step, 1, 1, "player4.png"  );
-     	}
+// ---------- Input handlers
+function keydownEventHandler(e)
+{
+   if ( !battle_active ) {
+      
+      // Vertical --------------------------------------------------
+      if ( e.keyCode == WKEY ) { // W key
+         // Update the player sprite to upper facing player
+         player.y -= PLAYERMOVEAMOUNT;
+         swapPlayer( player.x, player.y, 1, 1, "uparrow.png"  );
+      }
+      
+      else if ( e.keyCode == SKEY ) { // S key
+         // Update the player sprite to lower facing player
+         player.y += PLAYERMOVEAMOUNT;
+         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
+      }
 
-	if ( event.keyCode == 65 ) { // A key
-		// Update the player sprite to left facing player
-		swapPlayer( temp_x - step, temp_y, 1, 1, "player2.png"  );
-  	}
+      // Horizontal --------------------------------------------------
+      else if ( e.keyCode == AKEY ) { // A key
+         // Update the player sprite to left facing player
+         player.x -= PLAYERMOVEAMOUNT;
+         swapPlayer( player.x, player.y, 1, 1, "leftarrow.png"  );
+      }
+
+      else if ( e.keyCode == DKEY ) { // D key
+         // Update the player sprite to right facing player
+         player.x += PLAYERMOVEAMOUNT;
+         swapPlayer( player.x, player.y, 1, 1, "rightarrow.png"  );
+      }
+   }
+
+
+   else {
+      if (e.keyCode == WKEY) { // Up key 38
+         menu.up();
+      }
+
+      if (e.keyCode == SKEY) { // Down key 40
+         menu.down();
+      }
+
+      if ( ENTER ) { // Enter key
+         if ( mode == RUN ) {
+            swapPlayer( player.position.x - PLAYERMOVEAMOUNT, 
+                        player.position.y, 1, 1, "leftarrow.png"  );
+            endBattle();
+         }
 	
- 	if ( event.keyCode == 83 ) { // S key
-	    	// Update the player sprite to lower facing player
-		swapPlayer( temp_x, temp_y + step, 1, 1, "player3.png"  );
-	}
-	
-  	if ( event.keyCode == 68 ) { // D key
-		// Update the player sprite to right facing player
-		swapPlayer( temp_x + step, temp_y, 1, 1, "player1.png"  );
-	}
-  }
+         else if ( mode == FIGHT ) {
+            enemy_health--;
+            if ( enemy_health == 0 ) { 
+               alert("The enemy has been slain"); 
+               game_stage.removeChild( enemy ); 
+               enemies = []; 
+               endBattle();
+            }	
+         }
+      }
+   }
+}
 
-  else {
-       if (event.keyCode == 87) { // Up key 38
-    menu.up();
-  }
 
-  if (event.keyCode == 83) { // Down key 40
-    menu.down();
+function bound( sprite )
+{
+  // Given a sprite, make sure that it stays within the bounds of the screen
+  // Accounts for the sprites anchor position to keep the entirety of the sprite in bounds
+  if( sprite.position.x < sprite.anchor.x * 32 )
+  {
+    sprite.position.x = sprite.anchor.x * 32;
   }
-
-  if (event.keyCode == 13) { // Enter key
-	if ( mode == RUN ){
-		swapPlayer( player.position.x - (step*step), player.position.y, 1, 1, "player2.png"  );
-    		endBattle();
-        }
-	
-	else if ( mode == FIGHT ) {
-		enemy_health--;
-	        if ( enemy_health == 0 ) { alert("The enemy has been slain"); game_stage.removeChild( enemy ); enemies = []; endBattle();}	
-        }
+  else if( sprite.position.x + sprite.anchor.x * 32 > world.worldWidth )
+  {
+    sprite.position.x = world.worldWidth - sprite.anchor.x * 32;
   }
-
+  if( sprite.position.y < sprite.anchor.y * 32 )
+  {
+    sprite.position.y = sprite.anchor.y * 32;
+  }
+  else if( sprite.position.y + sprite.anchor.y * 32 > world.worldHeight )
+  {
+    sprite.position.y = world.worldHeight - sprite.anchor.y * 32;
   }
 }
+
+function boundObjects()
+{
+  // Keep players and enemies from moving off of the screen
+  bound( player );
+}
+
 
 function endBattle () {
 	battle_active = false; 
@@ -239,6 +313,9 @@ function createSprite (x, y, scale_x, scale_y, image ) {
 	sprite.position.y = y;
 	sprite.scale.x = scale_y;
 	sprite.scale.y = scale_x;
+   sprite.vx = 0;
+   sprite.vy = 0;
+   sprite.moving = false;
 	return sprite;
 }
 /**
@@ -285,4 +362,45 @@ function swapPlayer ( x, y, scale_x, scale_y, image ) {
 */
 function getRand( max ) {
 	return Math.floor(( Math.random() * max ) + 1 );
+}
+
+
+function contain(sprite, container) {
+
+  let collision = undefined;
+
+  //Left
+  if (sprite.x < container.x) {
+    sprite.x = container.x;
+    collision = "left";
+  }
+
+  //Top
+  if (sprite.y < container.y) {
+    sprite.y = container.y;
+    collision = "top";
+  }
+
+  //Right
+  if (sprite.x + sprite.width > container.width) {
+    sprite.x = container.width - sprite.width;
+    collision = "right";
+  }
+
+  //Bottom
+  if (sprite.y + sprite.height > container.height) {
+    sprite.y = container.height - sprite.height;
+    collision = "bottom";
+  }
+
+  //Return the `collision` value
+  return collision;
+}
+
+
+function update_camera() {
+  game_stage.x = -player.x*GAME_SCALE + GAME_WIDTH/2 - player.width/2*GAME_SCALE;
+  game_stage.y = -player.y*GAME_SCALE + GAME_HEIGHT/2 + player.height/2*GAME_SCALE;
+  game_stage.x = -Math.max(0, Math.min(world.worldWidth*GAME_SCALE - GAME_WIDTH, -game_stage.x));
+  game_stage.y = -Math.max(0, Math.min(world.worldHeight*GAME_SCALE - GAME_HEIGHT, -game_stage.y));
 }
