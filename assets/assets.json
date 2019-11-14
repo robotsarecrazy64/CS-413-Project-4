@@ -136,6 +136,10 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":25,"h":25},
 	"sourceSize": {"w":25,"h":25}
 }},
+"animations": {
+	"bat": ["bat1.png","bat2.png"],
+	"ex_meter": ["ex_meter0.png","ex_meter1.png","ex_meter2.png","ex_meter3.png","ex_meter4.png","ex_meter5.png","ex_meter6.png","ex_meter7.png","ex_meter8.png","ex_meter9.png","ex_meter10.png"]
+},
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.0",
@@ -143,6 +147,6 @@
 	"format": "RGBA8888",
 	"size": {"w":1000,"h":75},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:177014557773d83f03276d2c22c72e90:a282ddb2273afd2ff692b23235465022:a759b6bbc8381ac9c472b28f589ad0d6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:ccf3b60710661ab11544454b9eaa8e6f:15c98cf6c0ef1a3ba53cb171fdf79bfc:a759b6bbc8381ac9c472b28f589ad0d6$"
 }
 }
