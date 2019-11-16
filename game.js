@@ -69,12 +69,12 @@ function generateLevel()
    
    collidableArray = world.getObject("Collidable").data;
 	
-	player = createSprite( 25, 25, 1, 1, "rightarrow.png" );
+	player = createSprite( 975, 150, 1, 1, "rightarrow.png" );
    //player.anchor.x = .5;
    //player.anchor.y = .5;
 	game_stage.addChild( player );
 	
-	enemy = createMovieClip( 50, 50, 1, 1, "bat", 1, 2 );
+	enemy = createMovieClip( 750, 500, 1, 1, "bat", 1, 2 );
    enemy_health = 10;
 	
    subenemy = createMovieClip( 325, 200, 1, 1, "bat", 1, 2 );
