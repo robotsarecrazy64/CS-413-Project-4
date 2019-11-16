@@ -29,10 +29,7 @@ var health_meter;
 var player_alive = true;
 var player_speed = 5;
 var enemy;
-var enemy_health;
-var enemy_meter;
-var enemy_speed = 2;
-var enemy_alive = true;
+var enemy2;
 var enemies = [];
 var hand;
 var mode;
@@ -62,27 +59,26 @@ const ENTER = 13;
  
 function generateLevel() 
 {   
-   // Initialize tile utilities
-   tu = new TileUtilities( PIXI );
-   world = tu.makeTiledWorld("assets/map.json", "assets/tiles.png");
-   game_stage.addChild(world);
+	// Initialize tile utilities
+	tu = new TileUtilities( PIXI );
+	world = tu.makeTiledWorld("assets/map.json", "assets/tiles.png");
+	game_stage.addChild(world);
    
-   collidableArray = world.getObject("Collidable").data;
+	collidableArray = world.getObject("Collidable").data;
 	
 	player = createSprite( 975, 150, 1, 1, "rightarrow.png" );
-   //player.anchor.x = .5;
-   //player.anchor.y = .5;
+	//player.anchor.x = .5;
+	//player.anchor.y = .5;
 	game_stage.addChild( player );
 	
-	enemy = createMovieClip( 750, 500, 1, 1, "bat", 1, 2 );
-   enemy_health = 10;
+	enemy = new Enemy();
+	var enemy_sprite = createMovieClip( 700, 600, 1, 1, "bat", 1, 2 );
+	enemy2 = new Enemy({x: 700, y: 600, state: enemy_sprite, name: "Common Bat", attack: 1, speed: 6});
+	enemies.push( enemy );
+	enemies.push( enemy2 );
 	
-   subenemy = createMovieClip( 325, 200, 1, 1, "bat", 1, 2 );
-	
-   enemies.push(enemy);
-   //enemies.push(subenemy);
-	
-   game_stage.addChild( enemy );
+	game_stage.addChild( enemy.state );
+	game_stage.addChild( enemy2.state );
 	document.addEventListener('keydown', keydownEventHandler);
 	
 	master_stage.addChild(game_stage);
@@ -127,22 +123,10 @@ function generateBattleMenu()
 
 function update() 
 {
-   /**
-   if( checkEnemyPlayerCollisions() )
-   {
-      if ( count == 1 ) 
-      {
-         generateBattleMenu();
-         //alert("" + player.position.x);
-         count--;
-      }
-	}
-   */
-   
-   generateHealthMeter();
-   requestAnimationFrame(update);
-   update_camera();
-   renderer.render(master_stage);
+	generateHealthMeter();
+	requestAnimationFrame(update);
+	update_camera();
+	renderer.render(master_stage);
 }
 
 /**
@@ -193,7 +177,8 @@ function checkEnemyPlayerCollisions(){
 
 	for(var i in enemies){
 		var foe = enemies[i];
-		if(checkRectangleCollision(player, foe)){
+		if(checkRectangleCollision(player, foe.state)){
+			foe.is_hit = true;
 			return true;
 		}
 	}
@@ -238,15 +223,14 @@ var menu = StateMachine.create({
 });
 
 // ---------- Input handlers
-function keydownEventHandler(e)
-{
+function keydownEventHandler(event) {
   if ( player_alive ) {
       if ( !battle_active ) {
          
       var collide;
 
       // Vertical --------------------------------------------------
-      if ( e.keyCode == WKEY ) { // W key
+      if ( event.keyCode == WKEY ) { // W key
          // Update the player sprite to upper facing player
          player.y -= PLAYERMOVEAMOUNT;
          
@@ -272,7 +256,7 @@ function keydownEventHandler(e)
          swapPlayer( player.x, player.y, 1, 1, "uparrow.png"  );
       }
       
-      else if ( e.keyCode == SKEY ) { // S key
+      else if ( event.keyCode == SKEY ) { // S key
          // Update the player sprite to lower facing player
          player.y += PLAYERMOVEAMOUNT;
          
@@ -299,7 +283,7 @@ function keydownEventHandler(e)
       }
 
       // Horizontal --------------------------------------------------
-      else if ( e.keyCode == AKEY ) { // A key
+      else if ( event.keyCode == AKEY ) { // A key
          // Update the player sprite to left facing player
          player.x -= PLAYERMOVEAMOUNT;
          
@@ -325,7 +309,7 @@ function keydownEventHandler(e)
          swapPlayer( player.x, player.y, 1, 1, "leftarrow.png"  );
       }
 
-      else if ( e.keyCode == DKEY ) { // D key
+      else if ( event.keyCode == DKEY ) { // D key
          // Update the player sprite to right facing player
          player.x += PLAYERMOVEAMOUNT;
          
@@ -355,70 +339,85 @@ function keydownEventHandler(e)
 
    else 
    {
-      if (e.keyCode == WKEY) { // Up key 38
+      if ( event.keyCode == WKEY ) { // Up key 38
          menu.up();
       }
 
-      if (e.keyCode == SKEY) { // Down key 40
+      if ( event.keyCode == SKEY ) { // Down key 40
          menu.down();
       }
 
-      if ( e.keyCode == ENTER ) { // Enter key
+      if ( event.keyCode == ENTER ) { // Enter key
          
-         if ( mode == FIGHT ) { fight(); }
+         if ( mode == FIGHT ) { fight(checkTarget()); }
 
          else  if ( mode == STEAL ) { steal(); }
 
          else  if ( mode == ITEM ) { useItem(); }
       
-         else if ( mode == RUN ) { run(); }
+         else if ( mode == RUN ) { run(checkTarget()); }
       
       }
     }
   }
 }
 
+function checkTarget(){
 
-function fight() { //Pass in enemy
-  if( player_speed > enemy_speed ) {
-	playerAttack();
+	for(var i in enemies){
+		var foe = enemies[i];
+		if(foe.is_hit) {
+			return foe;
+		}
+	}
+}
+
+function fight( foe ) { //Pass in enemy
+  if( player_speed > foe.speed ) {
+	playerAttack( foe );
 	
-	if ( player_alive && enemy_alive ) {
-		enemyAttack(); //Pass in enemy
+	if ( player_alive && foe.is_alive ) {
+		enemyAttack( foe ); //Pass in enemy
 	}
   }
 
   else {
-	if ( player_alive && enemy_alive ) {
-		enemyAttack(); //Pass in enemy
+	if ( player_alive && foe.is_alive ) {
+		enemyAttack( foe ); //Pass in enemy
 	}
 	
-	playerAttack();
+	playerAttack( foe );
   }
 }
 
-function playerAttack() {
+function playerAttack(foe) {
+	if (player_alive) {
 	var player_attack = getRand(2) + 2;
 	alert("Your attack hit the enemy for " + player_attack + " damage.");
-	enemy_health -= player_attack;
+	foe.health -= player_attack;
 
-        if ( enemy_health <= 0 ) { 
+        if ( foe.health <= 0 ) { 
                alert("The enemy has been slain."); 
-               game_stage.removeChild( enemy );
-               game_stage.removeChild( enemy_meter );
-               enemy_alive = false;
-               enemies = []; 
-               endBattle();
+               game_stage.removeChild( foe.state );
+               game_stage.removeChild( foe.health_meter );
+               foe.is_alive = false;
+               var index = enemies.indexOf( foe );
+			   if (index > -1) {
+				enemies.splice(index, 1);
+			   }
+               endBattle(foe);
         }
 }
+}
 
-function enemyAttack() {
+function enemyAttack( foe ) {
+	if (foe.is_alive) {
 	var enemy_chance = getRand(10);
 	
 	if ( enemy_chance < 8 ) {
-		var enemy_attack = getRand(3);
-		alert("The enemy hits you for " + enemy_attack + " damage.");
-		player_health -= enemy_attack;
+		//foe.attack = getRand(3);
+		alert("The enemy hits you for " + foe.attack + " damage.");
+		player_health -= foe.attack;
 	}
 
 	else {
@@ -430,7 +429,8 @@ function enemyAttack() {
 		game_stage.removeChild( player ); 
 		game_stage.removeChild( health_meter );
 		player_alive = false;
-		endBattle();
+		endBattle(foe);
+	}
 	}
 }
 
@@ -466,7 +466,7 @@ function useItem() {
 
 
 
-function run() {
+function run(foe) {
 	var run_chance = getRand(10);
 	
 	if ( run_chance == 10 ) { //10% chance to fail
@@ -475,11 +475,8 @@ function run() {
 	}
 
 	else {
-        	//swapPlayer( player.position.x - PLAYERMOVEAMOUNT, 
-                    //player.position.y, 1, 1, "leftarrow.png"  ); //Pick a direction
-
-		alert("You have escaped.");
-		endBattle(); // run success
+        alert("You have escaped.");
+		endBattle(foe); // run success
 	}
 }
 
@@ -501,26 +498,13 @@ function generateHealthMeter () {
 		game_stage.addChild( health_meter );
 	}
 
-	
-	// Same Pattern for EACH enemy
-	if ( enemy_meter != null ) {
-		game_stage.removeChild( enemy_meter );
-		delete enemy_meter;
-	}
-
-	if ( enemy_health < 0 ) { enemy_health = 0; }
-
-	if ( enemy_health > 10 ) { enemy_health = 10; }
-	
-	if ( enemy_alive ) {
-		enemy_meter = new createSprite( enemy.position.x, enemy.position.y + 25, .2, .1, ( "ex_meter" + enemy_health + ".png" ) );
-		game_stage.addChild( enemy_meter );
-	}
+	enemy.updateHealthBar();
+	enemy2.updateHealthBar();
 }
 
-
-function endBattle () {
-	battle_active = false; 
+function endBattle (foe) {
+	battle_active = false;
+	foe.is_hit = false;
 	count = 1;
 	battle_stage.removeChild( hand );
 	battle_stage.removeChild( menu_text );
@@ -593,6 +577,60 @@ function update_camera() {
   game_stage.x = -player.x*GAME_SCALE + GAME_WIDTH/2 - player.width/2*GAME_SCALE;
   game_stage.y = -player.y*GAME_SCALE + GAME_HEIGHT/2 + player.height/2*GAME_SCALE;
   game_stage.x = -Math.max(0, Math.min(world.worldWidth*GAME_SCALE - GAME_WIDTH, -game_stage.x));
-  game_stage.y = -Math.max(0, Math.min(world.worldHeight*GAME_SCALE - GAME_HEIGHT, -game_stage.y));
-  
+  game_stage.y = -Math.max(0, Math.min(world.worldHeight*GAME_SCALE - GAME_HEIGHT, -game_stage.y)); 
 }
+
+/*
+---------------------------------------------------
+Enemy Class
+---------------------------------------------------
+enemy = new Enemy({x: 700, y: 400, state: enemy_sprite, name: "Common Bat", attack: 3, speed: 2}); //instantiation
+e1.print(); 													//calling a method     
+*/
+function Enemy(obj) {
+    'use strict';
+    if (typeof obj === "undefined") { // DEFAULT
+		this.x = 750;
+		this.y = 500;
+        this.state = createMovieClip( this.x, this.y, 1, 1, "bat", 1, 2 );
+        this.name = "Common Bat";
+		this.health = 10;
+		this.health_meter = new createSprite( this.x, this.y + 25, .2, .1, ( "ex_meter10.png" ) );
+		game_stage.addChild( this.health_meter );
+        this.attack = 3;
+		this.speed = 2;
+		this.is_alive = true;
+		this.is_hit = false;
+    } 
+	
+	else {
+		this.x = obj.x;
+		this.y = obj.y;
+        this.state = obj.state;
+        this.name = obj.name;
+		this.health = 10;
+		this.health_meter = new createSprite( this.x, this.y + 25, .2, .1, ( "ex_meter10.png" ) );
+		game_stage.addChild( this.health_meter );
+        this.attack = obj.attack;
+		this.speed = obj.speed;
+		this.is_alive = true;
+		this.is_hit = false;
+    }
+
+}
+
+Enemy.prototype.updateHealthBar = function () {
+    'use strict';
+    if ( this.health_meter != null ) {
+		game_stage.removeChild( this.health_meter );
+	}
+
+	if ( this.health < 0 ) { this.health = 0; }
+
+	if ( this.health > 10 ) { this.health = 10; }
+	
+	if ( this.is_alive ) {
+		this.health_meter = new createSprite( this.x, this.y + 25, .2, .1, ( "ex_meter" + this.health + ".png" ) );
+		game_stage.addChild( this.health_meter );
+	}
+};
