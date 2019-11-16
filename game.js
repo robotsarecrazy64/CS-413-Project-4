@@ -45,6 +45,7 @@ var battle_active = false;
 var item_looted = false;
 var world;
 var tu;
+var collidableArray;
 
 //Constants to inprove readability
 const PLAYERMOVEAMOUNT = 25;
@@ -61,24 +62,30 @@ const SPACE = 32;
 const SHIFT = 16;
 const ENTER = 13;
  
-function generateLevel() {
+function generateLevel() 
+{   
+   // Initialize tile utilities
+   tu = new TileUtilities( PIXI );
+   world = tu.makeTiledWorld("assets/map.json", "assets/tiles.png");
+   game_stage.addChild(world);
+   
+   collidableArray = world.getObject("Collidable").data;
 	
-	// Initialize tile utilities to create world map
-	tu = new TileUtilities( PIXI );
-	world = tu.makeTiledWorld("assets/map.json", "assets/tiles.png");
-	game_stage.addChild(world);
-	
-	player = createSprite( 50, 200, 1, 1, "rightarrow.png" );
-	//player.anchor.x = .5;
-	//player.anchor.y = .5;
+	player = createSprite( 25, 25, 1, 1, "rightarrow.png" );
+   //player.anchor.x = .5;
+   //player.anchor.y = .5;
+   
 	game_stage.addChild( player );
 	
-	enemy = createMovieClip( 350, 200, 1, 1, "bat", 1, 2 );
-        enemy_health = 10;
-	subenemy = createMovieClip( 325, 200, 1, 1, "bat", 1, 2 );
-	enemies.push(enemy);
-        enemies.push(subenemy);
-	game_stage.addChild( enemy );
+	enemy = createMovieClip( 50, 50, 1, 1, "bat", 1, 2 );
+   enemy_health = 10;
+	
+   subenemy = createMovieClip( 325, 200, 1, 1, "bat", 1, 2 );
+	
+   enemies.push(enemy);
+   //enemies.push(subenemy);
+	
+   game_stage.addChild( enemy );
 	document.addEventListener('keydown', keydownEventHandler);
 	
 	master_stage.addChild(game_stage);
@@ -86,45 +93,59 @@ function generateLevel() {
 	update();
 }
 
-function generateBattleMenu() {
-	if ( player_alive ) {
-		battle_stage = new PIXI.Container();
-		battle_active = true;
-		battle_stage.scale.x = 1.5;
-		battle_stage.scale.y = 1.5;
-		
-		if ( menu_text != null ) { delete menu_text;}
-  
-		menu_text = new PIXI.extras.BitmapText("fight\nsteal\nitem\nrun", {font: "16px gamefont"});
-		text2 = new PIXI.extras.BitmapText("", {font: "16px gamefont"});
-		menu_text.position.x = player.position.x - 150;
-		menu_text.position.y = player.position.y - 100;
-		battle_stage.addChild(menu_text);
-  
-		if ( hand != null ) { delete hand; }
+function generateBattleMenu() 
+{
+   if ( player_alive ) 
+   {
+      battle_stage = new PIXI.Container();
+      battle_active = true;
+      battle_stage.scale.x = 1.5;
+      battle_stage.scale.y = 1.5;
+      mode = RUN;
+      
+      if ( menu_text != null ) 
+      {
+         delete menu_text;
+      }
 
-		hand = new PIXI.Sprite(PIXI.Texture.fromImage("hand.png"));
-		hand.position.x = player.position.x - 172;
-		hand.position.y = player.position.y - 35;
- 
-		battle_stage.addChild(hand);
-		master_stage.addChild(battle_stage);
-	}
+      menu_text = new PIXI.extras.BitmapText("fight\nsteal\nitem\nrun", {font: "16px gamefont"});
+      text2 = new PIXI.extras.BitmapText("", {font: "16px gamefont"});
+      menu_text.position.x = 25;
+      menu_text.position.y = 250;
+      battle_stage.addChild( menu_text );
+
+      if ( hand != null ) 
+      {
+         delete hand;
+      }
+
+      hand = new PIXI.Sprite(PIXI.Texture.fromImage("hand.png"));
+      hand.position.x = menu_text.position.x - 20;
+      hand.position.y = menu_text.position.y + menu_text.height - 10;
+
+      battle_stage.addChild( hand );
+      master_stage.addChild( battle_stage );
+   }
 }
 
-function update() {
-	if(checkEnemyPlayerCollisions() ){
-		if ( count == 1 ) {
-			generateBattleMenu();
-			count--;
-		}
-	}	
-	
-	generateHealthMeter();
-	contain(player, {x: 0, y: 0, width: 1250, height: 1250});
-	requestAnimationFrame(update);
-	update_camera();
-	renderer.render(master_stage);
+function update() 
+{
+   /**
+   if( checkEnemyPlayerCollisions() )
+   {
+      if ( count == 1 ) 
+      {
+         generateBattleMenu();
+         //alert("" + player.position.x);
+         count--;
+      }
+	}
+   */
+   
+   generateHealthMeter();
+   requestAnimationFrame(update);
+   update_camera();
+   renderer.render(master_stage);
 }
 
 /**
@@ -207,71 +228,163 @@ var menu = StateMachine.create({
 		{name: "down", from: "item", to: "run"},
 		{name: "down", from: "run", to: "run"},
     
-		{name: "up", from: "fight", to: "fight"},
-		//{name: "up", from: "magic", to: "fight"},
-		{name: "up", from: "steal", to: "fight"}, //steal->magic
-		{name: "up", from: "item", to: "steal"},
-		{name: "up", from: "run", to: "item"}],
-	callbacks: {
-		onfight: function() { moveHand(hand.position.x, player.position.y - 95); mode = FIGHT;},
-		//onmagic: function() { moveHand(hand.position.x, player.position.y - 105); mode = 2; },
-		onsteal: function() { moveHand(hand.position.x, player.position.y - 75); mode = STEAL;},
-		onitem: function() { moveHand(hand.position.x,player.position.y - 55); mode = ITEM;},
-		onrun: function() { moveHand(hand.position.x,player.position.y - 35); mode = RUN;}
-	}});
+    {name: "up", from: "fight", to: "fight"},
+    //{name: "up", from: "magic", to: "fight"},
+    {name: "up", from: "steal", to: "fight"}, //steal->magic
+    {name: "up", from: "item", to: "steal"},
+    {name: "up", from: "run", to: "item"}
+
+  ],
+  callbacks: {
+    onfight: function() { moveHand(hand.position.x, menu_text.position.y + 
+                           menu_text.height - 70); mode = FIGHT;},
+    //onmagic: function() { moveHand(hand.position.x, player.position.y - 105); mode = 2; },
+    onsteal: function() { moveHand(hand.position.x, menu_text.position.y + 
+                           menu_text.height - 50); mode = STEAL;},
+    onitem: function() { moveHand(hand.position.x, menu_text.position.y + 
+                           menu_text.height - 30); mode = ITEM;},
+    onrun: function() { moveHand(hand.position.x, menu_text.position.y + 
+                           menu_text.height - 10); mode = RUN;}
+  }
+});
 
 // ---------- Input handlers
 function keydownEventHandler(event)
 {
-	if ( player_alive ) {
-		if ( !battle_active ) {
-		// Vertical --------------------------------------------------
-			if ( event.keyCode == WKEY ) { // W key
-			
-				// Update the player sprite to upper facing player
-				player.y -= PLAYERMOVEAMOUNT;
-				swapPlayer( player.x, player.y, 1, 1, "uparrow.png"  );
-			}
+  if ( player_alive ) {
+      if ( !battle_active ) {
+         
+      var collide;
+
+      // Vertical --------------------------------------------------
+      if ( e.keyCode == WKEY ) { // W key
+         // Update the player sprite to upper facing player
+         player.y -= PLAYERMOVEAMOUNT;
+         
+         // Does player try to move to tile they shouldn't?
+         collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
+         if( !collide.hit )
+         {
+            player.y += PLAYERMOVEAMOUNT;
+         }
+         
+         // Does player encounter enemy?
+         if( checkEnemyPlayerCollisions() )
+         {
+            if ( count == 1 ) 
+            {
+               player.y += PLAYERMOVEAMOUNT;
+               generateBattleMenu();
+               //alert("" + player.position.x);
+               count--;
+            }
+         }
+         
+         swapPlayer( player.x, player.y, 1, 1, "uparrow.png"  );
+      }
       
-			else if ( event.keyCode == SKEY ) { // S key
-				// Update the player sprite to lower facing player
-				player.y += PLAYERMOVEAMOUNT;
-				swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
-			}
+      else if ( e.keyCode == SKEY ) { // S key
+         // Update the player sprite to lower facing player
+         player.y += PLAYERMOVEAMOUNT;
+         
+         // Does player try to move to tile they shouldn't?
+         collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
+         if( !collide.hit )
+         {
+            player.y -= PLAYERMOVEAMOUNT;
+         }
+         
+         // Does player encounter enemy?
+         if( checkEnemyPlayerCollisions() )
+         {
+            if ( count == 1 ) 
+            {
+               player.y -= PLAYERMOVEAMOUNT;
+               generateBattleMenu();
+               //alert("" + player.position.x);
+               count--;
+            }
+         }
+         
+         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
+      }
 
-	    // Horizontal --------------------------------------------------
-			else if ( event.keyCode == AKEY ) { // A key
-				// Update the player sprite to left facing player
-				player.x -= PLAYERMOVEAMOUNT;
-				swapPlayer( player.x, player.y, 1, 1, "leftarrow.png"  );
-			}
+      // Horizontal --------------------------------------------------
+      else if ( e.keyCode == AKEY ) { // A key
+         // Update the player sprite to left facing player
+         player.x -= PLAYERMOVEAMOUNT;
+         
+         // Does player try to move to tile they shouldn't?
+         collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
+         if( !collide.hit )
+         {
+            player.x += PLAYERMOVEAMOUNT;
+         }
+         
+         // Does player encounter enemy?
+         if( checkEnemyPlayerCollisions() )
+         {
+            if ( count == 1 ) 
+            {
+               player.x += PLAYERMOVEAMOUNT;
+               generateBattleMenu();
+               //alert("" + player.position.x);
+               count--;
+            }
+         }
+         
+         swapPlayer( player.x, player.y, 1, 1, "leftarrow.png"  );
+      }
 
-			else if ( event.keyCode == DKEY ) { // D key
-				// Update the player sprite to right facing player
-				player.x += PLAYERMOVEAMOUNT;
-				swapPlayer( player.x, player.y, 1, 1, "rightarrow.png"  );
-			}
+      else if ( e.keyCode == DKEY ) { // D key
+         // Update the player sprite to right facing player
+         player.x += PLAYERMOVEAMOUNT;
+         
+         // Does player try to move to tile they shouldn't?
+         collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
+         if( !collide.hit )
+         {
+            player.x -= PLAYERMOVEAMOUNT;
+         }
+         
+         // Does player encounter enemy?
+         if( checkEnemyPlayerCollisions() )
+         {
+            if ( count == 1 ) 
+            {
+               player.x -= PLAYERMOVEAMOUNT;
+               generateBattleMenu();
+               //alert("" + player.position.x);
+               count--;
+            }
+         }
+         
+         swapPlayer( player.x, player.y, 1, 1, "rightarrow.png"  );
+      }
    }
 
 
-   else {
-		if (event.keyCode == WKEY) { // Up key 38
-			menu.up();
-		}
+   else 
+   {
+      if (e.keyCode == WKEY) { // Up key 38
+         menu.up();
+      }
 
 		if (event.keyCode == SKEY) { // Down key 40
 			menu.down();
 		}
 
-		if ( event.keyCode == ENTER ) { // Enter key
-			if ( mode == FIGHT ) { fight(); }
+      if ( e.keyCode == ENTER ) { // Enter key
+         
+         if ( mode == FIGHT ) { fight(); }
 
-			else if ( mode == STEAL ) { steal(); }
+         else  if ( mode == STEAL ) { steal(); }
 
-			else if ( mode == ITEM ) { useItem(); }
-	
-			else if ( mode == RUN ) { run(); }
-		}
+         else  if ( mode == ITEM ) { useItem(); }
+      
+         else if ( mode == RUN ) { run(); }
+      
+      }
     }
   }
 }
@@ -304,7 +417,7 @@ function playerAttack() {
         if ( enemy_health <= 0 ) { 
                alert("The enemy has been slain."); 
                game_stage.removeChild( enemy );
-	       game_stage.removeChild( enemy_meter );
+               game_stage.removeChild( enemy_meter );
                enemy_alive = false;
                enemies = []; 
                endBattle();
@@ -380,9 +493,6 @@ function run() {
 	}
 
 	else {
-        	swapPlayer( player.position.x - PLAYERMOVEAMOUNT, 
-						player.position.y, 1, 1, "leftarrow.png"  ); //Pick a direction
-
 		alert("You have escaped.");
 		endBattle(); // run success
 	}
@@ -524,47 +634,12 @@ function swapPlayer ( x, y, scale_x, scale_y, image ) {
 	game_stage.addChild( player );
 }
 
-
 /**
 	Helper function that returns a random number from 1 to max
 */
 function getRand( max ) {
 	return Math.floor(( Math.random() * max ) + 1 );
 }
-
-
-function contain(sprite, container) {
-
-  let collision = undefined;
-
-  //Left
-  if (sprite.x < container.x) {
-		sprite.x = container.x;
-		collision = "left";
-  }
-
-  //Top
-  if (sprite.y < container.y) {
-		sprite.y = container.y;
-		collision = "top";
-  }
-
-  //Right
-  if (sprite.x + sprite.width > container.width) {
-		sprite.x = container.width - sprite.width;
-		collision = "right";
-  }
-
-  //Bottom
-  if (sprite.y + sprite.height > container.height) {
-		sprite.y = container.height - sprite.height;
-		collision = "bottom";
-  }
-
-  //Return the `collision` value
-  return collision;
-}
-
 
 function update_camera() {
 	game_stage.x = -player.x*GAME_SCALE + GAME_WIDTH/2 - player.width/2*GAME_SCALE;
