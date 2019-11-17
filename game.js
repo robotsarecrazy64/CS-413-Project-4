@@ -73,7 +73,12 @@ function generateLevel()
 	
 	enemy = new Enemy();
 	var enemy_sprite = createMovieClip( 700, 600, 1, 1, "bat", 1, 2 );
-	enemy2 = new Enemy({x: 700, y: 600, state: enemy_sprite, name: "Common Bat", attack: 1, speed: 6});
+	enemy2 = new Enemy({x: 700, 
+						y: 600, 
+						state: createMovieClip( 700, 600, 1, 1, "bat", 1, 2 ), 
+						name: "Common Bat", 
+						attack: 1, 
+						speed: 6});
 	enemies.push( enemy );
 	enemies.push( enemy2 );
 	
@@ -124,9 +129,9 @@ function generateBattleMenu()
 function update() 
 {
 	generateHealthMeter();
-	requestAnimationFrame(update);
+	requestAnimationFrame( update );
 	update_camera();
-	renderer.render(master_stage);
+	renderer.render( master_stage );
 }
 
 /**
@@ -135,7 +140,7 @@ function update()
  * @param {*} otherObject a PIXi.Container Object of subclass
  * @returns true if there is collisoin; false if otherwise
  */
-function checkRectangleCollision(object, otherObject){
+function checkRectangleCollision( object, otherObject ){
 
 	let collision = false, combinedHalfWidths, xVector, yVector
 
@@ -339,25 +344,25 @@ function keydownEventHandler(event) {
 
    else 
    {
-      if ( event.keyCode == WKEY ) { // Up key 38
-         menu.up();
-      }
+		if ( event.keyCode == WKEY ) { // Up key 38
+			menu.up();
+		}
 
-      if ( event.keyCode == SKEY ) { // Down key 40
-         menu.down();
-      }
+		if ( event.keyCode == SKEY ) { // Down key 40
+			menu.down();
+		}
 
-      if ( event.keyCode == ENTER ) { // Enter key
+		if ( event.keyCode == ENTER ) { // Enter key
          
-         if ( mode == FIGHT ) { fight(checkTarget()); }
+			if ( mode == FIGHT ) { fight( checkTarget() ); }
 
-         else  if ( mode == STEAL ) { steal(); }
+			else  if ( mode == STEAL ) { steal( checkTarget() ); }
 
-         else  if ( mode == ITEM ) { useItem(); }
+			else  if ( mode == ITEM ) { useItem( checkTarget() ); }
       
-         else if ( mode == RUN ) { run(checkTarget()); }
+			else if ( mode == RUN ) { run( checkTarget() ); }
       
-      }
+		}
     }
   }
 }
@@ -390,93 +395,101 @@ function fight( foe ) { //Pass in enemy
   }
 }
 
-function playerAttack(foe) {
+/**
+	Handles player attack in combat
+*/
+function playerAttack( foe ) {
 	if (player_alive) {
-	var player_attack = getRand(2) + 2;
-	alert("Your attack hit the enemy for " + player_attack + " damage.");
-	foe.health -= player_attack;
+		var player_attack = getRand(2) + 2;
+		alert("Your attack hit the enemy for " + player_attack + " damage.");
+		foe.health -= player_attack;
 
-        if ( foe.health <= 0 ) { 
-               alert("The enemy has been slain."); 
-               game_stage.removeChild( foe.state );
-               game_stage.removeChild( foe.health_meter );
-               foe.is_alive = false;
-               var index = enemies.indexOf( foe );
-			   if (index > -1) {
+		if ( foe.health <= 0 ) { 
+			alert("The enemy has been slain."); 
+			game_stage.removeChild( foe.state );
+			game_stage.removeChild( foe.health_meter );
+			foe.is_alive = false;
+			var index = enemies.indexOf( foe );
+			if (index > -1) {
 				enemies.splice(index, 1);
-			   }
-               endBattle(foe);
-        }
-}
+			}
+				   
+			endBattle(foe);
+		}
+	}
 }
 
+/**
+	Helper function that handles enemy attack in combat
+*/
 function enemyAttack( foe ) {
-	if (foe.is_alive) {
-	var enemy_chance = getRand(10);
-	
-	if ( enemy_chance < 8 ) {
-		//foe.attack = getRand(3);
-		alert("The enemy hits you for " + foe.attack + " damage.");
-		player_health -= foe.attack;
-	}
+	if ( foe.is_alive ) {
+		var enemy_chance = getRand(10);
+		
+		if ( enemy_chance < 8 ) {
+			alert( "The enemy hits you for " + foe.attack + " damage." );
+			player_health -= foe.attack;
+		}
 
-	else {
-		alert("The enemy misses their attack.");
-	}
+		else {
+			alert("The enemy misses their attack.");
+		}
 
-	if ( player_health <= 0 ) {
-		alert("You have fallen in battle. ;-;");
-		game_stage.removeChild( player ); 
-		game_stage.removeChild( health_meter );
-		player_alive = false;
-		endBattle(foe);
-	}
+		if ( player_health <= 0 ) {
+			alert("You have fallen in battle. ;-;");
+			game_stage.removeChild( player ); 
+			game_stage.removeChild( health_meter );
+			player_alive = false;
+			endBattle( foe );
+		}
 	}
 }
 
-
-function steal() {
+/**
+	Helper function that handles steal action in combat
+*/
+function steal( foe ) {
 	var steal_chance = getRand(10);
-	if ( player_speed > enemy_speed ) {
+	if ( player_speed > foe.speed ) {
 		if ( steal_chance < 6 ) { alert("Couldn't steal."); } //50% chance
 
 		else { alert("You have stolen <item> from enemy."); }
 
-		enemyAttack();
+		enemyAttack( foe );
 	}
 
 	else {
-		enemyAttack();
+		enemyAttack( foe );
 	
 		if ( steal_chance < 6 ) { alert("Couldn't steal."); } //50% chance
 
 		else { alert("You have stolen <item> from enemy."); }	
 	}
-
-	
-	
-	
 }
 
-function useItem() {
+/**
+	Helper function that handles using an item action in combat
+*/
+function useItem( foe ) {
 	alert("You drink a health potion.");
 	player_health += getRand(3) + 2; //30% - 50%
-	enemyAttack();
+	enemyAttack( foe );
 }
 
-
-
-function run(foe) {
+/**
+	Helper function that handles run action in combat
+*/
+function run( foe ) {
 	var run_chance = getRand(10);
 	
 	if ( run_chance == 10 ) { //10% chance to fail
 		alert("Couldn't get away.");
-		enemyAttack(); // run fail
+		enemyAttack( foe ); // run fail
 	}
 
 	else {
         alert("You have escaped.");
-		endBattle(foe); // run success
+		endBattle( foe ); // run success
 	}
 }
 
@@ -494,15 +507,20 @@ function generateHealthMeter () {
 	if ( player_health > 10 ) { player_health = 10; }
 
 	if ( player_alive ) {
-		health_meter = new createSprite( player.position.x, player.position.y + 25, .2, .1, ( "ex_meter" + player_health + ".png" ) );
+		health_meter = createSprite( player.position.x, player.position.y + 25, .2, .1, ( "ex_meter" + player_health + ".png" ) );
 		game_stage.addChild( health_meter );
 	}
 
-	enemy.updateHealthBar();
-	enemy2.updateHealthBar();
+	for(var item in enemies){
+		var foe = enemies[item];
+		foe.updateHealthBar();
+	}
 }
 
-function endBattle (foe) {
+/**
+	Helper function that ends the battle
+*/
+function endBattle ( foe ) {
 	battle_active = false;
 	foe.is_hit = false;
 	count = 1;
@@ -521,19 +539,21 @@ function createSprite (x, y, scale_x, scale_y, image ) {
 	sprite.position.y = y;
 	sprite.scale.x = scale_y;
 	sprite.scale.y = scale_x;
-   sprite.vx = 0;
-   sprite.vy = 0;
-   sprite.moving = false;
+	sprite.vx = 0;
+	sprite.vy = 0;
+	sprite.moving = false;
 	return sprite;
 }
+
 /**
+	Helper function that creates a shape
 */
 function createShape() {
-   var graphics = new PIXI.Graphics();
-   graphics.beginFill('0x000000');
-   graphics.drawRect(0, 0, 1100, 500);
-   graphics.endFill();
-   return graphics;
+	var graphics = new PIXI.Graphics();
+	graphics.beginFill('0x000000');
+	graphics.drawRect(0, 0, 1100, 500);
+	graphics.endFill();
+	return graphics;
 }
 
 /**
@@ -572,7 +592,9 @@ function getRand( max ) {
 	return Math.floor(( Math.random() * max ) + 1 );
 }
 
-
+/**
+	Updates the camera
+*/
 function update_camera() {
   game_stage.x = -player.x*GAME_SCALE + GAME_WIDTH/2 - player.width/2*GAME_SCALE;
   game_stage.y = -player.y*GAME_SCALE + GAME_HEIGHT/2 + player.height/2*GAME_SCALE;
@@ -580,12 +602,13 @@ function update_camera() {
   game_stage.y = -Math.max(0, Math.min(world.worldHeight*GAME_SCALE - GAME_HEIGHT, -game_stage.y)); 
 }
 
-/*
+/**
 ---------------------------------------------------
 Enemy Class
 ---------------------------------------------------
-enemy = new Enemy({x: 700, y: 400, state: enemy_sprite, name: "Common Bat", attack: 3, speed: 2}); //instantiation
-e1.print(); 													//calling a method     
+Example:
+enemy = new Enemy({x: 700, y: 400, state: enemy_sprite, name: "Common Bat", attack: 3, speed: 2}); 	//instantiation
+enemy.updateHealthBar(); 																			//calling a method     
 */
 function Enemy(obj) {
     'use strict';
@@ -595,7 +618,7 @@ function Enemy(obj) {
         this.state = createMovieClip( this.x, this.y, 1, 1, "bat", 1, 2 );
         this.name = "Common Bat";
 		this.health = 10;
-		this.health_meter = new createSprite( this.x, this.y + 25, .2, .1, ( "ex_meter10.png" ) );
+		this.health_meter = createSprite( this.x, this.y + 25, .2, .1, ( "ex_meter10.png" ) );
 		game_stage.addChild( this.health_meter );
         this.attack = 3;
 		this.speed = 2;
@@ -609,7 +632,7 @@ function Enemy(obj) {
         this.state = obj.state;
         this.name = obj.name;
 		this.health = 10;
-		this.health_meter = new createSprite( this.x, this.y + 25, .2, .1, ( "ex_meter10.png" ) );
+		this.health_meter = createSprite( this.x, this.y + 25, .2, .1, ( "ex_meter10.png" ) );
 		game_stage.addChild( this.health_meter );
         this.attack = obj.attack;
 		this.speed = obj.speed;
@@ -619,6 +642,9 @@ function Enemy(obj) {
 
 }
 
+/**
+	Updates the enemy health meter
+*/
 Enemy.prototype.updateHealthBar = function () {
     'use strict';
     if ( this.health_meter != null ) {
@@ -630,7 +656,7 @@ Enemy.prototype.updateHealthBar = function () {
 	if ( this.health > 10 ) { this.health = 10; }
 	
 	if ( this.is_alive ) {
-		this.health_meter = new createSprite( this.x, this.y + 25, .2, .1, ( "ex_meter" + this.health + ".png" ) );
+		this.health_meter = createSprite( this.x, this.y + 25, .2, .1, ( "ex_meter" + this.health + ".png" ) );
 		game_stage.addChild( this.health_meter );
 	}
 };
