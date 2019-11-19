@@ -65,6 +65,7 @@ function generateLevel()
 	game_stage.addChild(world);
    
 	collidableArray = world.getObject("Collidable").data;
+   teleportArray = world.getObject("Teleport").data;
 	
 	player = createSprite( 975, 150, 1, 1, "rightarrow.png" );
 	//player.anchor.x = .5;
@@ -238,12 +239,21 @@ function keydownEventHandler(event) {
       if ( event.keyCode == WKEY ) { // W key
          // Update the player sprite to upper facing player
          player.y -= PLAYERMOVEAMOUNT;
+         swapPlayer( player.x, player.y, 1, 1, "uparrow.png"  );
+         
+         collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
+         teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
          
          // Does player try to move to tile they shouldn't?
-         collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
          if( !collide.hit )
          {
             player.y += PLAYERMOVEAMOUNT;
+         }
+         
+         // Does player transition to new area?
+         if( !teleport.hit )
+         {
+            teleportPlayer( teleport.index );
          }
          
          // Does player encounter enemy?
@@ -257,19 +267,26 @@ function keydownEventHandler(event) {
                count--;
             }
          }
-         
-         swapPlayer( player.x, player.y, 1, 1, "uparrow.png"  );
       }
       
       else if ( event.keyCode == SKEY ) { // S key
          // Update the player sprite to lower facing player
          player.y += PLAYERMOVEAMOUNT;
+         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
+         
+         collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
+         teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
          
          // Does player try to move to tile they shouldn't?
-         collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
          if( !collide.hit )
          {
             player.y -= PLAYERMOVEAMOUNT;
+         }
+         
+         // Does player transition to new area?
+         if( !teleport.hit )
+         {
+            teleportPlayer( teleport.index );
          }
          
          // Does player encounter enemy?
@@ -283,20 +300,27 @@ function keydownEventHandler(event) {
                count--;
             }
          }
-         
-         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
       }
 
       // Horizontal --------------------------------------------------
       else if ( event.keyCode == AKEY ) { // A key
          // Update the player sprite to left facing player
          player.x -= PLAYERMOVEAMOUNT;
+         swapPlayer( player.x, player.y, 1, 1, "leftarrow.png"  );
+         
+         collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
+         teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
          
          // Does player try to move to tile they shouldn't?
-         collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
          if( !collide.hit )
          {
             player.x += PLAYERMOVEAMOUNT;
+         }
+         
+         // Does player transition to new area?
+         if( !teleport.hit )
+         {
+            teleportPlayer( teleport.index );
          }
          
          // Does player encounter enemy?
@@ -310,19 +334,26 @@ function keydownEventHandler(event) {
                count--;
             }
          }
-         
-         swapPlayer( player.x, player.y, 1, 1, "leftarrow.png"  );
       }
 
       else if ( event.keyCode == DKEY ) { // D key
          // Update the player sprite to right facing player
          player.x += PLAYERMOVEAMOUNT;
+         swapPlayer( player.x, player.y, 1, 1, "rightarrow.png"  );
+         
+         collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
+         teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
          
          // Does player try to move to tile they shouldn't?
-         collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
          if( !collide.hit )
          {
             player.x -= PLAYERMOVEAMOUNT;
+         }
+         
+         // Does player transition to new area?
+         if( !teleport.hit )
+         {
+            teleportPlayer( teleport.index );
          }
          
          // Does player encounter enemy?
@@ -337,7 +368,7 @@ function keydownEventHandler(event) {
             }
          }
          
-         swapPlayer( player.x, player.y, 1, 1, "rightarrow.png"  );
+
       }
    }
 
@@ -366,6 +397,30 @@ function keydownEventHandler(event) {
     }
   }
 }
+
+// Transition player to new area based on teleporter touched
+function teleportPlayer( teleportIndex )
+{
+   switch( teleportIndex )
+   {
+      case 4545:
+         player.x += PLAYERMOVEAMOUNT * 10;
+         swapPlayer( player.x, player.y, 1, 1, "rightarrow.png"  );
+         break;
+         
+      case 4554:
+         player.x -= PLAYERMOVEAMOUNT * 10;
+         player.y += PLAYERMOVEAMOUNT * 9;
+         swapPlayer( player.x, player.y, 1, 1, "leftarrow.png"  );
+         break;
+         
+      case 5445:
+         player.y -= PLAYERMOVEAMOUNT * 10;
+         swapPlayer( player.x, player.y, 1, 1, "uparrow.png"  );
+         break;
+   }
+}
+
 
 function checkTarget(){
 
