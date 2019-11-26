@@ -67,7 +67,7 @@ function generateLevel()
 	collidableArray = world.getObject("Collidable").data;
    teleportArray = world.getObject("Teleport").data;
 	
-	player = createSprite( PLAYERMOVEAMOUNT * 2, PLAYERMOVEAMOUNT * 106, 1, 1, "rightarrow.png" );
+	player = createSprite( PLAYERMOVEAMOUNT * 2, PLAYERMOVEAMOUNT * 106, 1, 1, "Player right.png" );
 	//player.anchor.x = .5;
 	//player.anchor.y = .5;
 	game_stage.addChild( player );
@@ -239,7 +239,7 @@ function keydownEventHandler(event) {
       if ( event.keyCode == WKEY ) { // W key
          // Update the player sprite to upper facing player
          player.y -= PLAYERMOVEAMOUNT;
-         swapPlayer( player.x, player.y, 1, 1, "uparrow.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player up.png"  );
          
          collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
          teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
@@ -272,7 +272,7 @@ function keydownEventHandler(event) {
       else if ( event.keyCode == SKEY ) { // S key
          // Update the player sprite to lower facing player
          player.y += PLAYERMOVEAMOUNT;
-         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player down.png"  );
          
          collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
          teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
@@ -306,7 +306,7 @@ function keydownEventHandler(event) {
       else if ( event.keyCode == AKEY ) { // A key
          // Update the player sprite to left facing player
          player.x -= PLAYERMOVEAMOUNT;
-         swapPlayer( player.x, player.y, 1, 1, "leftarrow.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player left.png"  );
          
          collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
          teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
@@ -339,7 +339,7 @@ function keydownEventHandler(event) {
       else if ( event.keyCode == DKEY ) { // D key
          // Update the player sprite to right facing player
          player.x += PLAYERMOVEAMOUNT;
-         swapPlayer( player.x, player.y, 1, 1, "rightarrow.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player right.png"  );
          
          collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
          teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
@@ -407,61 +407,61 @@ function teleportPlayer( teleportIndex )
       case 10644:
          player.x = PLAYERMOVEAMOUNT * 4;
          player.y = PLAYERMOVEAMOUNT * 3;
-         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player down.png"  );
          break;
          
       case 204:
          player.x = PLAYERMOVEAMOUNT * 44;
          player.y = PLAYERMOVEAMOUNT * 107;
-         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player down.png"  );
          break;
       
       case 4544:
          player.x = PLAYERMOVEAMOUNT * 55;
          player.y = PLAYERMOVEAMOUNT * 44;
-         swapPlayer( player.x, player.y, 1, 1, "uparrow.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player up.png"  );
          break;
       
       case 4555:
          player.x = PLAYERMOVEAMOUNT * 44;
          player.y = PLAYERMOVEAMOUNT * 44;
-         swapPlayer( player.x, player.y, 1, 1, "uparrow.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player up.png"  );
          break;
       
       case 495:
          player.x = PLAYERMOVEAMOUNT * 55;
          player.y = PLAYERMOVEAMOUNT * 107;
-         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player down.png"  );
          break;
       
       case 10655:
          player.x = PLAYERMOVEAMOUNT * 95;
          player.y = PLAYERMOVEAMOUNT * 5;
-         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player down.png"  );
          break;
       
       case 10698:
          player.x = PLAYERMOVEAMOUNT * 1;
          player.y = PLAYERMOVEAMOUNT * 94;
-         swapPlayer( player.x, player.y, 1, 1, "uparrow.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player up.png"  );
          break;
          
       case 9501:
          player.x = PLAYERMOVEAMOUNT * 98;
          player.y = PLAYERMOVEAMOUNT * 107;
-         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player down.png"  );
          break;
       
       case 5644:
          player.x = PLAYERMOVEAMOUNT * 55;
          player.y = PLAYERMOVEAMOUNT * 57;
-         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player down.png"  );
          break;
       
       case 5655:
          player.x = PLAYERMOVEAMOUNT * 44;
          player.y = PLAYERMOVEAMOUNT * 57;
-         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player down.png"  );
          break;
       
       

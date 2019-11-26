@@ -181,6 +181,10 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
+            <key type="filename">Player down.png</key>
+            <key type="filename">Player left.png</key>
+            <key type="filename">Player right.png</key>
+            <key type="filename">Player up.png</key>
             <key type="filename">bat1.png</key>
             <key type="filename">bat2.png</key>
             <key type="filename">downarrow.png</key>
@@ -242,6 +246,10 @@
             <filename>leftarrow.png</filename>
             <filename>rightarrow.png</filename>
             <filename>uparrow.png</filename>
+            <filename>Player down.png</filename>
+            <filename>Player left.png</filename>
+            <filename>Player up.png</filename>
+            <filename>Player right.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
