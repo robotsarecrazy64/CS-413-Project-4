@@ -67,7 +67,7 @@ function generateLevel()
 	collidableArray = world.getObject("Collidable").data;
    teleportArray = world.getObject("Teleport").data;
 	
-	player = createSprite( 975, 150, 1, 1, "rightarrow.png" );
+	player = createSprite( PLAYERMOVEAMOUNT * 2, PLAYERMOVEAMOUNT * 106, 1, 1, "rightarrow.png" );
 	//player.anchor.x = .5;
 	//player.anchor.y = .5;
 	game_stage.addChild( player );
@@ -401,23 +401,71 @@ function keydownEventHandler(event) {
 // Transition player to new area based on teleporter touched
 function teleportPlayer( teleportIndex )
 {
+   //alert(teleportIndex);
    switch( teleportIndex )
    {
-      case 4545:
-         player.x += PLAYERMOVEAMOUNT * 10;
-         swapPlayer( player.x, player.y, 1, 1, "rightarrow.png"  );
+      case 10644:
+         player.x = PLAYERMOVEAMOUNT * 4;
+         player.y = PLAYERMOVEAMOUNT * 3;
+         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
          break;
          
-      case 4554:
-         player.x -= PLAYERMOVEAMOUNT * 10;
-         player.y += PLAYERMOVEAMOUNT * 9;
-         swapPlayer( player.x, player.y, 1, 1, "leftarrow.png"  );
+      case 204:
+         player.x = PLAYERMOVEAMOUNT * 44;
+         player.y = PLAYERMOVEAMOUNT * 107;
+         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
          break;
-         
-      case 5445:
-         player.y -= PLAYERMOVEAMOUNT * 10;
+      
+      case 4544:
+         player.x = PLAYERMOVEAMOUNT * 55;
+         player.y = PLAYERMOVEAMOUNT * 44;
          swapPlayer( player.x, player.y, 1, 1, "uparrow.png"  );
          break;
+      
+      case 4555:
+         player.x = PLAYERMOVEAMOUNT * 44;
+         player.y = PLAYERMOVEAMOUNT * 44;
+         swapPlayer( player.x, player.y, 1, 1, "uparrow.png"  );
+         break;
+      
+      case 495:
+         player.x = PLAYERMOVEAMOUNT * 55;
+         player.y = PLAYERMOVEAMOUNT * 107;
+         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
+         break;
+      
+      case 10655:
+         player.x = PLAYERMOVEAMOUNT * 95;
+         player.y = PLAYERMOVEAMOUNT * 5;
+         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
+         break;
+      
+      case 10698:
+         player.x = PLAYERMOVEAMOUNT * 1;
+         player.y = PLAYERMOVEAMOUNT * 94;
+         swapPlayer( player.x, player.y, 1, 1, "uparrow.png"  );
+         break;
+         
+      case 9501:
+         player.x = PLAYERMOVEAMOUNT * 98;
+         player.y = PLAYERMOVEAMOUNT * 107;
+         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
+         break;
+      
+      case 5644:
+         player.x = PLAYERMOVEAMOUNT * 55;
+         player.y = PLAYERMOVEAMOUNT * 57;
+         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
+         break;
+      
+      case 5655:
+         player.x = PLAYERMOVEAMOUNT * 44;
+         player.y = PLAYERMOVEAMOUNT * 57;
+         swapPlayer( player.x, player.y, 1, 1, "downarrow.png"  );
+         break;
+      
+      
+      
    }
 }
 
