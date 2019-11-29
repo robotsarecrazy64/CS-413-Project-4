@@ -39,15 +39,27 @@ var item_text;
 var step = 10;
 var count = 1;
 var battle_active = false;
+var dialogue_active = false;
 var world;
 var tu;
-var collidableArray;
+var playerDirection;
+var npc12112_dialogue = [];
+var currentDialogue = 0;
+var currentNPC = 0;
+var dialogueEnd = true;
+var dialogueBox;
+var dialogueText;
 
 const PLAYERMOVEAMOUNT = 25;
 const FIGHT = 1;
 const STEAL = 2;
 const ITEM = 3;
 const RUN = 4;
+
+const RIGHT = -1;
+const LEFT = -2;
+const UP = -3;
+const DOWN = -4;
 
 const WKEY = 87;
 const AKEY = 65;
@@ -66,9 +78,11 @@ function generateLevel()
    
 	collidableArray = world.getObject("Collidable").data;
    teleportArray = world.getObject("Teleport").data;
+   npcArray = world.getObject("NPC").data;
 	
 	player = createMovieClip( PLAYERMOVEAMOUNT * 2, PLAYERMOVEAMOUNT * 106, 1, 1, "Player right", 1, 3 );
-	//player.anchor.x = .5;
+	playerDirection = RIGHT;
+   //player.anchor.x = .5;
 	//player.anchor.y = .5;
 	game_stage.addChild( player );
 	
@@ -82,6 +96,8 @@ function generateLevel()
 						speed: 6});
 	enemies.push( enemy );
 	enemies.push( enemy2 );
+   
+   initialize_npc_dialogue();
 	
 	game_stage.addChild( enemy.state );
 	game_stage.addChild( enemy2.state );
@@ -230,174 +246,275 @@ var menu = StateMachine.create({
 
 // ---------- Input handlers
 function keydownEventHandler(event) {
-  if ( player_alive ) {
-      if ( !battle_active ) {
-         
-      var collide;
-
-      // Vertical --------------------------------------------------
-      if ( event.keyCode == WKEY ) { // W key
-         // Update the player sprite to upper facing player
-         player.y -= PLAYERMOVEAMOUNT;
-         swapPlayer( player.x, player.y, 1, 1, "Player up"  );
-         
-         collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
-         teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
-         
-         // Does player try to move to tile they shouldn't?
-         if( !collide.hit )
+   if ( player_alive ) {
+      if ( !battle_active && !dialogue_active ) {
+      
+         // Vertical --------------------------------------------------
+         if ( event.keyCode == WKEY )
          {
-            player.y += PLAYERMOVEAMOUNT;
-         }
-         
-         // Does player transition to new area?
-         if( !teleport.hit )
-         {
-            teleportPlayer( teleport.index );
-         }
-         
-         // Does player encounter enemy?
-         if( checkEnemyPlayerCollisions() )
-         {
-            if ( count == 1 ) 
+            // Update the player sprite to upper facing player
+            player.y -= PLAYERMOVEAMOUNT;
+            swapPlayer( player.x, player.y, 1, 1, "Player up"  );
+            playerDirection = UP;
+            
+            collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
+            teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
+            npc = tu.hitTestTile(player, npcArray, 0, world, "every");
+            
+            // Does player try to move to tile they shouldn't?
+            if( !collide.hit || !npc.hit )
             {
                player.y += PLAYERMOVEAMOUNT;
-               generateBattleMenu();
-               //alert("" + player.position.x);
-               count--;
+            }
+            
+            // Does player transition to new area?
+            if( !teleport.hit )
+            {
+               teleportPlayer( teleport.index );
+            }
+            
+            // Does player encounter enemy?
+            if( checkEnemyPlayerCollisions() )
+            {
+               if ( count == 1 ) 
+               {
+                  player.y += PLAYERMOVEAMOUNT;
+                  generateBattleMenu();
+                  //alert("" + player.position.x);
+                  count--;
+               }
             }
          }
-      }
-      
-      else if ( event.keyCode == SKEY ) { // S key
-         // Update the player sprite to lower facing player
-         player.y += PLAYERMOVEAMOUNT;
-         swapPlayer( player.x, player.y, 1, 1, "Player down"  );
          
-         collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
-         teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
-         
-         // Does player try to move to tile they shouldn't?
-         if( !collide.hit )
+         else if ( event.keyCode == SKEY ) 
          {
-            player.y -= PLAYERMOVEAMOUNT;
-         }
-         
-         // Does player transition to new area?
-         if( !teleport.hit )
-         {
-            teleportPlayer( teleport.index );
-         }
-         
-         // Does player encounter enemy?
-         if( checkEnemyPlayerCollisions() )
-         {
-            if ( count == 1 ) 
+            // Update the player sprite to lower facing player
+            player.y += PLAYERMOVEAMOUNT;
+            swapPlayer( player.x, player.y, 1, 1, "Player down"  );
+            playerDirection = DOWN;
+            
+            collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
+            teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
+            npc = tu.hitTestTile(player, npcArray, 0, world, "every");
+            
+            // Does player try to move to tile they shouldn't?
+            if( !collide.hit || !npc.hit )
             {
                player.y -= PLAYERMOVEAMOUNT;
-               generateBattleMenu();
-               //alert("" + player.position.x);
-               count--;
+            }
+            
+            // Does player transition to new area?
+            if( !teleport.hit )
+            {
+               teleportPlayer( teleport.index );
+            }
+            
+            // Does player encounter enemy?
+            if( checkEnemyPlayerCollisions() )
+            {
+               if ( count == 1 ) 
+               {
+                  player.y -= PLAYERMOVEAMOUNT;
+                  generateBattleMenu();
+                  //alert("" + player.position.x);
+                  count--;
+               }
             }
          }
-      }
 
-      // Horizontal --------------------------------------------------
-      else if ( event.keyCode == AKEY ) { // A key
-         // Update the player sprite to left facing player
-         player.x -= PLAYERMOVEAMOUNT;
-         swapPlayer( player.x, player.y, 1, 1, "Player left"  );
-         
-         collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
-         teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
-         
-         // Does player try to move to tile they shouldn't?
-         if( !collide.hit )
+         // Horizontal --------------------------------------------------
+         else if ( event.keyCode == AKEY ) 
          {
-            player.x += PLAYERMOVEAMOUNT;
-         }
-         
-         // Does player transition to new area?
-         if( !teleport.hit )
-         {
-            teleportPlayer( teleport.index );
-         }
-         
-         // Does player encounter enemy?
-         if( checkEnemyPlayerCollisions() )
-         {
-            if ( count == 1 ) 
+            // Update the player sprite to left facing player
+            player.x -= PLAYERMOVEAMOUNT;
+            swapPlayer( player.x, player.y, 1, 1, "Player left"  );
+            playerDirection = LEFT;
+            
+            collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
+            teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
+            npc = tu.hitTestTile(player, npcArray, 0, world, "every");
+            
+            // Does player try to move to tile they shouldn't?
+            if( !collide.hit || !npc.hit )
             {
                player.x += PLAYERMOVEAMOUNT;
-               generateBattleMenu();
-               //alert("" + player.position.x);
-               count--;
+            }
+            
+            // Does player transition to new area?
+            if( !teleport.hit )
+            {
+               teleportPlayer( teleport.index );
+            }
+            
+            // Does player encounter enemy?
+            if( checkEnemyPlayerCollisions() )
+            {
+               if ( count == 1 ) 
+               {
+                  player.x += PLAYERMOVEAMOUNT;
+                  generateBattleMenu();
+                  //alert("" + player.position.x);
+                  count--;
+               }
             }
          }
-      }
 
-      else if ( event.keyCode == DKEY ) { // D key
-         // Update the player sprite to right facing player
-         player.x += PLAYERMOVEAMOUNT;
-         swapPlayer( player.x, player.y, 1, 1, "Player right"  );
-         
-         collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
-         teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
-         
-         // Does player try to move to tile they shouldn't?
-         if( !collide.hit )
+         else if ( event.keyCode == DKEY ) 
          {
-            player.x -= PLAYERMOVEAMOUNT;
-         }
-         
-         // Does player transition to new area?
-         if( !teleport.hit )
-         {
-            teleportPlayer( teleport.index );
-         }
-         
-         // Does player encounter enemy?
-         if( checkEnemyPlayerCollisions() )
-         {
-            if ( count == 1 ) 
+            // Update the player sprite to right facing player
+            player.x += PLAYERMOVEAMOUNT;
+            swapPlayer( player.x, player.y, 1, 1, "Player right"  );
+            playerDirection = RIGHT; 
+            
+            collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
+            teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
+            npc = tu.hitTestTile(player, npcArray, 0, world, "every");
+            
+            // Does player try to move to tile they shouldn't?
+            if( !collide.hit || !npc.hit )
             {
                player.x -= PLAYERMOVEAMOUNT;
-               generateBattleMenu();
-               //alert("" + player.position.x);
-               count--;
+            }
+            
+            // Does player transition to new area?
+            if( !teleport.hit )
+            {
+               teleportPlayer( teleport.index );
+            }
+            
+            // Does player encounter enemy?
+            if( checkEnemyPlayerCollisions() )
+            {
+               if ( count == 1 ) 
+               {
+                  player.x -= PLAYERMOVEAMOUNT;
+                  generateBattleMenu();
+                  //alert("" + player.position.x);
+                  count--;
+               }
             }
          }
          
+         else if ( event.keyCode == ENTER ) 
+         {
+            if( checkNPCInteraction() )
+            {
+               dialogueBox = createRoundedRect( 0, 400, 500, 100, 10, "white" );
+               dialogueText = new PIXI.Text(npc12112_dialogue[currentDialogue], 
+                  {fontFamily : 'Calibri', fontSize: 25, fill : 0xFFFFFF, align : 'center'});
+               dialogueText.y = 400;
+               currentDialogue++;
+   
+               master_stage.addChild( dialogueBox );
+               master_stage.addChild( dialogueText );
+   
+               dialogue_active = true;
+               dialogueEnd = false;
+            }
+         }
+      }
 
+
+      else if ( battle_active )
+      {
+         if ( event.keyCode == WKEY ) { // Up key 38
+            menu.up();
+         }
+
+         if ( event.keyCode == SKEY ) { // Down key 40
+            menu.down();
+         }
+
+         if ( event.keyCode == ENTER ) { // Enter key
+            
+            if ( mode == FIGHT ) { fight( checkTarget() ); }
+
+            else  if ( mode == STEAL ) { steal( checkTarget() ); }
+
+            else  if ( mode == ITEM ) { useItem( checkTarget() ); }
+         
+            else if ( mode == RUN ) { run( checkTarget() ); }
+         
+         }
+      }
+      
+      else if ( dialogue_active )
+      {
+         if ( event.keyCode == ENTER )
+         {
+            if( !dialogueEnd )
+            {
+               iterateDialogue();
+            }
+            
+            else
+            {
+               dialogue_active = false;
+               master_stage.removeChild( dialogueBox );
+               master_stage.removeChild( dialogueText );
+               currentDialogue = 0;
+            }
+         }
       }
    }
-
-
-   else 
-   {
-		if ( event.keyCode == WKEY ) { // Up key 38
-			menu.up();
-		}
-
-		if ( event.keyCode == SKEY ) { // Down key 40
-			menu.down();
-		}
-
-		if ( event.keyCode == ENTER ) { // Enter key
-			var target = checkTarget();
-		 
-			if ( mode == FIGHT ) { fight( target ); }
-
-			else  if ( mode == STEAL ) { steal( target ); }
-
-			else  if ( mode == ITEM ) { useItem( target ); }
-      
-			else if ( mode == RUN ) { run( target ); }
-      
-		}
-    }
-  }
 }
+
+
+function checkNPCInteraction()
+{
+   // NPC at 12, 112
+   return checkValidInteraction( 12, 112 );
+}
+
+
+function checkValidInteraction( npcX, npcY )
+{
+
+   if( (playerDirection == UP && 
+       npcX * 25 == player.x && npcY * 25 + 25 == player.y) ||  
+       
+       (playerDirection == DOWN && 
+       npcX * 25 == player.x && npcY * 25 - 25 == player.y) ||
+       
+       (playerDirection == LEFT && 
+       npcX * 25 + 25 == player.x && npcY * 25 == player.y) ||
+       
+       (playerDirection == RIGHT && 
+       npcX * 25 - 25 == player.x && npcY * 25 == player.y)  )
+   {
+      currentNPC = 12112;
+      return true;
+   }
+}
+
+
+function iterateDialogue()
+{
+   switch( currentNPC )
+   {
+      case 12112:
+         dialogueText.setText(npc12112_dialogue[currentDialogue]);
+         currentDialogue++;
+         
+         if( currentDialogue == npc12112_dialogue.length )
+         {
+            dialogueEnd = true;
+         }
+         
+         break;
+   }
+}
+
+
+function initialize_npc_dialogue()
+{  
+   npc12112_dialogue.push( "hey" );
+   npc12112_dialogue.push( "hello" );
+   npc12112_dialogue.push( "test" );
+   npc12112_dialogue.push( "press" );
+   npc12112_dialogue.push( "enter" );
+}
+
 
 // Transition player to new area based on teleporter touched
 function teleportPlayer( teleportIndex )
@@ -409,64 +526,71 @@ function teleportPlayer( teleportIndex )
          player.x = PLAYERMOVEAMOUNT * 4;
          player.y = PLAYERMOVEAMOUNT * 3;
          swapPlayer( player.x, player.y, 1, 1, "Player down"  );
+         playerDirection = DOWN;
          break;
          
       case 204:
          player.x = PLAYERMOVEAMOUNT * 44;
          player.y = PLAYERMOVEAMOUNT * 107;
          swapPlayer( player.x, player.y, 1, 1, "Player down"  );
+         playerDirection = DOWN;
          break;
       
       case 4544:
          player.x = PLAYERMOVEAMOUNT * 55;
          player.y = PLAYERMOVEAMOUNT * 44;
          swapPlayer( player.x, player.y, 1, 1, "Player up"  );
+         playerDirection = UP;
          break;
       
       case 4555:
          player.x = PLAYERMOVEAMOUNT * 44;
          player.y = PLAYERMOVEAMOUNT * 44;
          swapPlayer( player.x, player.y, 1, 1, "Player up"  );
+         playerDirection = UP;
          break;
       
       case 495:
          player.x = PLAYERMOVEAMOUNT * 55;
          player.y = PLAYERMOVEAMOUNT * 107;
          swapPlayer( player.x, player.y, 1, 1, "Player down"  );
+         playerDirection = DOWN;
          break;
       
       case 10655:
          player.x = PLAYERMOVEAMOUNT * 95;
          player.y = PLAYERMOVEAMOUNT * 5;
          swapPlayer( player.x, player.y, 1, 1, "Player down"  );
+         playerDirection = DOWN;
          break;
       
       case 10698:
          player.x = PLAYERMOVEAMOUNT * 1;
          player.y = PLAYERMOVEAMOUNT * 94;
          swapPlayer( player.x, player.y, 1, 1, "Player up"  );
+         playerDirection = UP;
          break;
          
       case 9501:
          player.x = PLAYERMOVEAMOUNT * 98;
          player.y = PLAYERMOVEAMOUNT * 107;
          swapPlayer( player.x, player.y, 1, 1, "Player down"  );
+         playerDirection = DOWN;
          break;
       
       case 5644:
          player.x = PLAYERMOVEAMOUNT * 55;
          player.y = PLAYERMOVEAMOUNT * 57;
          swapPlayer( player.x, player.y, 1, 1, "Player down"  );
+         playerDirection = DOWN;
          break;
       
       case 5655:
          player.x = PLAYERMOVEAMOUNT * 44;
          player.y = PLAYERMOVEAMOUNT * 57;
          swapPlayer( player.x, player.y, 1, 1, "Player down"  );
+         playerDirection = DOWN;
          break;
-      
-      
-      
    }
 }
 
