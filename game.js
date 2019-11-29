@@ -90,7 +90,7 @@ function generateLevel()
 	var enemy_sprite = createMovieClip( 700, 600, 1, 1, "bat", 1, 2 );
 	enemy2 = new Enemy({x: 700, 
 						y: 600, 
-						state: createMovieClip( 700, 600, 1, 1, "bat", 1, 2 ), 
+						state: createMovieClip( 700, 600, 1, 1, "Goblin", 1, 2 ), 
 						name: "Common Bat", 
 						attack: 1, 
 						speed: 6});
@@ -402,6 +402,7 @@ function keydownEventHandler(event) {
                dialogueBox = createRoundedRect( 0, 400, 500, 100, 10, "white" );
                dialogueText = new PIXI.Text(npc12112_dialogue[currentDialogue], 
                   {fontFamily : 'Calibri', fontSize: 25, fill : 0xFFFFFF, align : 'center'});
+               dialogueText.y = 5;
                dialogueText.y = 400;
                currentDialogue++;
    

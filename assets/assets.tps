@@ -181,10 +181,32 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">Player down.png</key>
-            <key type="filename">Player left.png</key>
-            <key type="filename">Player right.png</key>
-            <key type="filename">Player up.png</key>
+            <key type="filename">Goblin1.png</key>
+            <key type="filename">Goblin2.png</key>
+            <key type="filename">Player down1.png</key>
+            <key type="filename">Player down2.png</key>
+            <key type="filename">Player down3.png</key>
+            <key type="filename">Player left1.png</key>
+            <key type="filename">Player left2.png</key>
+            <key type="filename">Player left3.png</key>
+            <key type="filename">Player right1.png</key>
+            <key type="filename">Player right2.png</key>
+            <key type="filename">Player right3.png</key>
+            <key type="filename">Player up1.png</key>
+            <key type="filename">Player up2.png</key>
+            <key type="filename">Player up3.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0,0</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>6,6,13,13</rect>
+                <key>scale9Paddings</key>
+                <rect>6,6,13,13</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
             <key type="filename">bat1.png</key>
             <key type="filename">bat2.png</key>
             <key type="filename">downarrow.png</key>
@@ -246,10 +268,20 @@
             <filename>leftarrow.png</filename>
             <filename>rightarrow.png</filename>
             <filename>uparrow.png</filename>
-            <filename>Player down.png</filename>
-            <filename>Player left.png</filename>
-            <filename>Player up.png</filename>
-            <filename>Player right.png</filename>
+            <filename>Player down1.png</filename>
+            <filename>Player down2.png</filename>
+            <filename>Player down3.png</filename>
+            <filename>Player left1.png</filename>
+            <filename>Player left2.png</filename>
+            <filename>Player left3.png</filename>
+            <filename>Player right1.png</filename>
+            <filename>Player right2.png</filename>
+            <filename>Player right3.png</filename>
+            <filename>Player up1.png</filename>
+            <filename>Player up2.png</filename>
+            <filename>Player up3.png</filename>
+            <filename>Goblin1.png</filename>
+            <filename>Goblin2.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
