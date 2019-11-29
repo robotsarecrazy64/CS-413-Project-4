@@ -67,7 +67,7 @@ function generateLevel()
 	collidableArray = world.getObject("Collidable").data;
    teleportArray = world.getObject("Teleport").data;
 	
-	player = createSprite( PLAYERMOVEAMOUNT * 2, PLAYERMOVEAMOUNT * 106, 1, 1, "Player right.png" );
+	player = createMovieClip( PLAYERMOVEAMOUNT * 2, PLAYERMOVEAMOUNT * 106, 1, 1, "Player right", 1, 3 );
 	//player.anchor.x = .5;
 	//player.anchor.y = .5;
 	game_stage.addChild( player );
@@ -108,10 +108,10 @@ function generateBattleMenu()
       }
 
       menu_text = new PIXI.extras.BitmapText("fight\nsteal\nitem\nrun", {font: "16px gamefont"});
-      text2 = new PIXI.extras.BitmapText("", {font: "16px gamefont"});
-      menu_text.position.x = 25;
+      //text2 = new PIXI.extras.BitmapText("", {font: "16px gamefont"});
+      menu_text.position.x = 250;
       menu_text.position.y = 250;
-      battle_stage.addChild( menu_text );
+	  battle_stage.addChild( menu_text );
 
       if ( hand != null ) 
       {
@@ -239,7 +239,7 @@ function keydownEventHandler(event) {
       if ( event.keyCode == WKEY ) { // W key
          // Update the player sprite to upper facing player
          player.y -= PLAYERMOVEAMOUNT;
-         swapPlayer( player.x, player.y, 1, 1, "Player up.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player up"  );
          
          collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
          teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
@@ -272,7 +272,7 @@ function keydownEventHandler(event) {
       else if ( event.keyCode == SKEY ) { // S key
          // Update the player sprite to lower facing player
          player.y += PLAYERMOVEAMOUNT;
-         swapPlayer( player.x, player.y, 1, 1, "Player down.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player down"  );
          
          collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
          teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
@@ -306,7 +306,7 @@ function keydownEventHandler(event) {
       else if ( event.keyCode == AKEY ) { // A key
          // Update the player sprite to left facing player
          player.x -= PLAYERMOVEAMOUNT;
-         swapPlayer( player.x, player.y, 1, 1, "Player left.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player left"  );
          
          collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
          teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
@@ -339,7 +339,7 @@ function keydownEventHandler(event) {
       else if ( event.keyCode == DKEY ) { // D key
          // Update the player sprite to right facing player
          player.x += PLAYERMOVEAMOUNT;
-         swapPlayer( player.x, player.y, 1, 1, "Player right.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player right"  );
          
          collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
          teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
@@ -384,14 +384,15 @@ function keydownEventHandler(event) {
 		}
 
 		if ( event.keyCode == ENTER ) { // Enter key
-         
-			if ( mode == FIGHT ) { fight( checkTarget() ); }
+			var target = checkTarget();
+		 
+			if ( mode == FIGHT ) { fight( target ); }
 
-			else  if ( mode == STEAL ) { steal( checkTarget() ); }
+			else  if ( mode == STEAL ) { steal( target ); }
 
-			else  if ( mode == ITEM ) { useItem( checkTarget() ); }
+			else  if ( mode == ITEM ) { useItem( target ); }
       
-			else if ( mode == RUN ) { run( checkTarget() ); }
+			else if ( mode == RUN ) { run( target ); }
       
 		}
     }
@@ -407,61 +408,61 @@ function teleportPlayer( teleportIndex )
       case 10644:
          player.x = PLAYERMOVEAMOUNT * 4;
          player.y = PLAYERMOVEAMOUNT * 3;
-         swapPlayer( player.x, player.y, 1, 1, "Player down.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player down"  );
          break;
          
       case 204:
          player.x = PLAYERMOVEAMOUNT * 44;
          player.y = PLAYERMOVEAMOUNT * 107;
-         swapPlayer( player.x, player.y, 1, 1, "Player down.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player down"  );
          break;
       
       case 4544:
          player.x = PLAYERMOVEAMOUNT * 55;
          player.y = PLAYERMOVEAMOUNT * 44;
-         swapPlayer( player.x, player.y, 1, 1, "Player up.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player up"  );
          break;
       
       case 4555:
          player.x = PLAYERMOVEAMOUNT * 44;
          player.y = PLAYERMOVEAMOUNT * 44;
-         swapPlayer( player.x, player.y, 1, 1, "Player up.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player up"  );
          break;
       
       case 495:
          player.x = PLAYERMOVEAMOUNT * 55;
          player.y = PLAYERMOVEAMOUNT * 107;
-         swapPlayer( player.x, player.y, 1, 1, "Player down.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player down"  );
          break;
       
       case 10655:
          player.x = PLAYERMOVEAMOUNT * 95;
          player.y = PLAYERMOVEAMOUNT * 5;
-         swapPlayer( player.x, player.y, 1, 1, "Player down.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player down"  );
          break;
       
       case 10698:
          player.x = PLAYERMOVEAMOUNT * 1;
          player.y = PLAYERMOVEAMOUNT * 94;
-         swapPlayer( player.x, player.y, 1, 1, "Player up.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player up"  );
          break;
          
       case 9501:
          player.x = PLAYERMOVEAMOUNT * 98;
          player.y = PLAYERMOVEAMOUNT * 107;
-         swapPlayer( player.x, player.y, 1, 1, "Player down.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player down"  );
          break;
       
       case 5644:
          player.x = PLAYERMOVEAMOUNT * 55;
          player.y = PLAYERMOVEAMOUNT * 57;
-         swapPlayer( player.x, player.y, 1, 1, "Player down.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player down"  );
          break;
       
       case 5655:
          player.x = PLAYERMOVEAMOUNT * 44;
          player.y = PLAYERMOVEAMOUNT * 57;
-         swapPlayer( player.x, player.y, 1, 1, "Player down.png"  );
+         swapPlayer( player.x, player.y, 1, 1, "Player down"  );
          break;
       
       
@@ -627,6 +628,10 @@ function endBattle ( foe ) {
 	battle_active = false;
 	foe.is_hit = false;
 	count = 1;
+	clearBattleScreen();
+}
+
+function clearBattleScreen() {
 	battle_stage.removeChild( hand );
 	battle_stage.removeChild( menu_text );
 	battle_stage = new PIXI.Container();
@@ -649,12 +654,12 @@ function createSprite (x, y, scale_x, scale_y, image ) {
 }
 
 /**
-	Helper function that creates a shape
+	Helper function that creates a rounded rectangle
 */
-function createShape() {
+function createRoundedRect( x, y, width, height, radius, color ) {
 	var graphics = new PIXI.Graphics();
-	graphics.beginFill('0x000000');
-	graphics.drawRect(0, 0, 1100, 500);
+	graphics.beginFill(color);
+	graphics.drawRoundedRect( x, y, width, height, radius );
 	graphics.endFill();
 	return graphics;
 }
@@ -683,7 +688,7 @@ function createMovieClip ( x, y, scale_x, scale_y, image, low, high ) {
 */
 function swapPlayer ( x, y, scale_x, scale_y, image ) {
 	game_stage.removeChild( player );
-	player = createSprite( x, y, scale_x, scale_y, image );
+	player = createMovieClip( x, y, scale_x, scale_y, image, 1, 3 );
 	game_stage.addChild( player );
 }
 
