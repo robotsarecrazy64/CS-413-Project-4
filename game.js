@@ -18,17 +18,23 @@ PIXI.loader
   .load(generateLevel);
 
 var battle_stage = new PIXI.Container();
+var battle_text_stage = new PIXI.Container();
 var game_stage = new PIXI.Container();
 game_stage.scale.x = GAME_SCALE;
 game_stage.scale.y = GAME_SCALE;
 
 var master_stage = new PIXI.Container();
+var battle_screen;
 var player;
+var temp_x;
+var temp_y;
+var temp_direction;
 var player_health = 10;
 var health_meter;
 var player_alive = true;
 var player_speed = 5;
 var enemy;
+var current_enemy;
 var enemy2;
 var enemies = [];
 var hand;
@@ -51,10 +57,10 @@ var dialogueBox;
 var dialogueText;
 
 const PLAYERMOVEAMOUNT = 25;
-const FIGHT = 1;
-const STEAL = 2;
-const ITEM = 3;
-const RUN = 4;
+const FIGHT = 100;
+const STEAL = 200;
+const ITEM = 300;
+const RUN = 400;
 
 const RIGHT = -1;
 const LEFT = -2;
@@ -68,6 +74,9 @@ const DKEY = 68;
 const SPACE = 32;
 const SHIFT = 16;
 const ENTER = 13;
+
+const BAT = 1;
+const GOBLIN = 2;
  
 function generateLevel() 
 {   
@@ -87,17 +96,17 @@ function generateLevel()
 	game_stage.addChild( player );
 	
 	enemy = new Enemy();
-	var enemy_sprite = createMovieClip( 700, 600, 1, 1, "bat", 1, 2 );
-	enemy2 = new Enemy({x: 700, 
+	enemy2 = new Enemy({id: GOBLIN,
+						x: 700, 
 						y: 600, 
 						state: createMovieClip( 700, 600, 1, 1, "Goblin", 1, 2 ), 
-						name: "Common Bat", 
+						name: "Goblin", 
 						attack: 1, 
 						speed: 6});
 	enemies.push( enemy );
 	enemies.push( enemy2 );
    
-   initialize_npc_dialogue();
+    initialize_npc_dialogue();
 	
 	game_stage.addChild( enemy.state );
 	game_stage.addChild( enemy2.state );
@@ -113,10 +122,14 @@ function generateBattleMenu()
    if ( player_alive ) 
    {
       battle_stage = new PIXI.Container();
+	  battle_text_stage = new PIXI.Container();
       battle_active = true;
-      battle_stage.scale.x = 1.5;
-      battle_stage.scale.y = 1.5;
+      battle_text_stage.scale.x = 1.5;
+      battle_text_stage.scale.y = 1.5;
       mode = RUN;
+	  
+	  battle_screen = new PIXI.Sprite(PIXI.Texture.fromImage("battle_menu_forest.png"));
+	  battle_stage.addChild( battle_screen );
       
       if ( menu_text != null ) 
       {
@@ -125,9 +138,38 @@ function generateBattleMenu()
 
       menu_text = new PIXI.extras.BitmapText("fight\nsteal\nitem\nrun", {font: "16px gamefont"});
       //text2 = new PIXI.extras.BitmapText("", {font: "16px gamefont"});
-      menu_text.position.x = 250;
+      menu_text.position.x = 100;
       menu_text.position.y = 250;
-	  battle_stage.addChild( menu_text );
+	  menu_text.scale_x = 1.5;
+	  menu_text.scale_y = 1.5;
+	  battle_text_stage.addChild( menu_text );
+	  
+	  temp_x = player.position.x;
+	  temp_y = player.position.y;
+	  temp_direction = playerDirection;
+	  
+	  swapPlayer( player.x, player.y, 1, 1, "Player right"  );
+	  player.position.x = 100;
+	  player.position.y = 200;
+	  player.scale.x = 5;
+	  player.scale.y = 5;
+	  
+	  battle_stage.addChild( player );
+	  
+	  current_enemy = checkTarget();
+	  switch ( current_enemy.id ) {
+			case BAT:
+				current_enemy.state = createMovieClip( 250, 200, 1, 1, current_enemy.name, 1, 2 );
+				break;
+			case GOBLIN:
+				current_enemy.state = createMovieClip( 250, 200, 5, 5, current_enemy.name, 1, 2 );
+				break;
+	  }
+	  
+	  //current_enemy.state.position.x = 150;
+	  //current_enemy.state.position.y = 200;
+	  //alert("Target: " + current_enemy.name);
+	  battle_stage.addChild( current_enemy.state );
 
       if ( hand != null ) 
       {
@@ -138,7 +180,9 @@ function generateBattleMenu()
       hand.position.x = menu_text.position.x - 20;
       hand.position.y = menu_text.position.y + menu_text.height - 10;
 
-      battle_stage.addChild( hand );
+	  
+      battle_text_stage.addChild( hand );
+	  battle_stage.addChild(battle_text_stage);
       master_stage.addChild( battle_stage );
    }
 }
@@ -146,9 +190,26 @@ function generateBattleMenu()
 function update() 
 {
 	generateHealthMeter();
+	//removeDeadEnemies();
 	requestAnimationFrame( update );
 	update_camera();
-	renderer.render( master_stage );
+	if ( battle_active ) { renderer.render( battle_stage ); }
+	else { renderer.render( master_stage ); }
+}
+
+/**
+
+*/
+function removeDeadEnemies () {
+	for(var i in enemies){
+		var foe = enemies[i];
+		if(!foe.is_alive){
+			delete foe;
+			game_stage.removeChild( foe.state );
+			master_stage.removeChild( foe.state );
+			
+		}
+	}
 }
 
 /**
@@ -279,7 +340,7 @@ function keydownEventHandler(event) {
                if ( count == 1 ) 
                {
                   player.y += PLAYERMOVEAMOUNT;
-                  generateBattleMenu();
+                  generateBattleMenu( checkTarget() );
                   //alert("" + player.position.x);
                   count--;
                }
@@ -642,7 +703,7 @@ function playerAttack( foe ) {
 			if (index > -1) {
 				enemies.splice(index, 1);
 			}
-				   
+			
 			endBattle(foe);
 		}
 	}
@@ -718,6 +779,10 @@ function run( foe ) {
 
 	else {
         alert("You have escaped.");
+		for(var i in enemies){
+		var foe = enemies[i];
+		alert(foe.name);
+		}
 		endBattle( foe ); // run success
 	}
 }
@@ -752,13 +817,34 @@ function generateHealthMeter () {
 function endBattle ( foe ) {
 	battle_active = false;
 	foe.is_hit = false;
+	mode = RUN;
 	count = 1;
 	clearBattleScreen();
 }
 
 function clearBattleScreen() {
-	battle_stage.removeChild( hand );
-	battle_stage.removeChild( menu_text );
+	battle_text_stage.removeChild( hand );
+	battle_text_stage.removeChild( menu_text );
+	battle_stage.removeChild( battle_screen );
+	battle_stage.removeChild( player );
+	
+	switch ( temp_direction ) {
+			case UP:
+				swapPlayer( temp_x, temp_y, 1, 1, "Player up"  );
+				break;
+			case DOWN:
+				swapPlayer( temp_x, temp_y, 1, 1, "Player down"  );
+				break;
+			case LEFT:
+				swapPlayer( temp_x, temp_y, 1, 1, "Player left"  );
+				break;
+			case RIGHT:
+				swapPlayer( temp_x, temp_y, 1, 1, "Player right"  );
+				break;
+	}
+	
+	battle_stage.removeChild( current_enemy.state );
+	current_enemy = null;
 	battle_stage = new PIXI.Container();
 	master_stage.removeChild( battle_stage ); 
 }
@@ -840,16 +926,17 @@ function update_camera() {
 Enemy Class
 ---------------------------------------------------
 Example:
-enemy = new Enemy({x: 700, y: 400, state: enemy_sprite, name: "Common Bat", attack: 3, speed: 2}); 	//instantiation
+enemy = new Enemy({id: 1(monster id), x: 700, y: 400, state: enemy_sprite, name: "Common Bat", attack: 3, speed: 2}); 	//instantiation
 enemy.updateHealthBar(); 																			//calling a method     
 */
 function Enemy(obj) {
     'use strict';
     if (typeof obj === "undefined") { // DEFAULT
+		this.id = 1;
 		this.x = 750;
 		this.y = 500;
-        this.state = createMovieClip( this.x, this.y, 1, 1, "bat", 1, 2 );
-        this.name = "Common Bat";
+        this.state = createMovieClip( this.x, this.y, 1, 1, "Overworld_Bat", 1, 2 );
+        this.name = "Bat";
 		this.health = 10;
 		this.health_meter = createSprite( this.x, this.y + 25, .2, .1, ( "ex_meter10.png" ) );
 		game_stage.addChild( this.health_meter );
@@ -860,6 +947,7 @@ function Enemy(obj) {
     } 
 	
 	else {
+		this.id = obj.id;
 		this.x = obj.x;
 		this.y = obj.y;
         this.state = obj.state;
