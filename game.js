@@ -22,6 +22,7 @@ var attack_stage = new PIXI.Container();
 var steal_stage = new PIXI.Container();
 var item_stage = new PIXI.Container();
 var battle_text_stage = new PIXI.Container();
+var threat_stage = new PIXI.Container();
 var game_stage = new PIXI.Container();
 game_stage.scale.x = GAME_SCALE;
 game_stage.scale.y = GAME_SCALE;
@@ -39,8 +40,10 @@ var temp_direction;
 var player_health = 10;
 var health_meter;
 var player_alive = true;
+var player_charge;
 var player_speed = 5;
 var enemy;
+var danger_level;
 var current_enemy;
 var enemy2;
 var enemies = [];
@@ -85,6 +88,11 @@ const ENTER = 13;
 
 const BAT = 1;
 const GOBLIN = 2;
+const PIXIE = 3;
+const OGRE = 4;
+const TREE_BOSS = 5;
+const POSSESSED_SOLDIER = 6;
+const SKELETON = 7;
  
 function generateLevel() 
 {   
@@ -94,8 +102,8 @@ function generateLevel()
 	game_stage.addChild(world);
    
 	collidableArray = world.getObject("Collidable").data;
-   teleportArray = world.getObject("Teleport").data;
-   npcArray = world.getObject("NPC").data;
+    teleportArray = world.getObject("Teleport").data;
+    npcArray = world.getObject("NPC").data;
 	
 	player = createMovieClip( PLAYERMOVEAMOUNT * 2, PLAYERMOVEAMOUNT * 106, 1, 1, "PlayerRight", 1, 3 );
 	playerDirection = RIGHT;
@@ -106,6 +114,7 @@ function generateLevel()
 	
 	enemy = new Enemy();
 	enemy2 = new Enemy({id: GOBLIN,
+						num_charges: 1,
 						x: 700, 
 						y: 600, 
 						state: createMovieClip( 700, 600, 1, 1, "Goblin", 1, 2 ), 
@@ -145,7 +154,7 @@ function generateBattleMenu()
          delete menu_text;
       }
 
-      menu_text = new PIXI.extras.BitmapText("fight\nsteal\nitem\nrun", {font: "16px gamefont"});
+      menu_text = new PIXI.extras.BitmapText("fight\nskill\nitem\nrun", {font: "16px gamefont"});
       menu_text.position.x = 105;
       menu_text.position.y = 250;
 	  battle_text_stage.addChild( menu_text );
@@ -159,7 +168,7 @@ function generateBattleMenu()
 	  temp_y = player.position.y;
 	  temp_direction = playerDirection;
 	  
-	  swapPlayer( 100, 200, 5, 5, "PlayerAttack", 1, 5 );
+	  swapPlayer( 100, 200, 5, 5, "PlayerRight", 1, 3 );
 	  
 	  battle_stage.addChild( player );
 	  
@@ -181,6 +190,7 @@ function generateBattleMenu()
 	  }
 	  
 	  battle_stage.addChild( current_enemy.state );
+	  battle_stage.addChild( threat_stage );
 
       if ( hand != null ) 
       {
@@ -706,18 +716,37 @@ function playerAttack( foe ) {
 	if (player_alive) {
 		var player_attack = getRand(2) + 2;
 		//alert("Your attack hit the enemy for " + player_attack + " damage.");
-		swapPlayer( 100, 200, 5, 5, "PlayerRight", 1, 3  );
+		swapPlayer( 100, 200, 5, 5, "PlayerAttack", 1, 3  );
+		player.loop = false;
+		player.onComplete = swapPlayer( 100, 200, 5, 5, "PlayerRight", 1, 3  );
+		var temp_state = foe.state;
+		foe.state = createMovieClip( foe.state.position.x, foe.state.position.y, foe.state.scale.x, foe.state.scale.y, foe.name + "damage", 1, 3 );
+		foe.loop = false;
+		
+		var animationFinished = function () {
+			//alert("Animation just reached it's end.");
+			foe.state = temp_state;
+			foe.gotoAndStop(0);
+		};
+		
+		foe.onComplete = animationFinished;
+
 		foe.health -= player_attack;
 
 		if ( foe.health <= 0 ) { 
-			//alert("The enemy has been slain."); 
-			foe.is_alive = false;
-			var index = enemies.indexOf( foe );
-			if (index > -1) {
-				enemies.splice(index, 1);
+			
+			//alert("The enemy has been slain.");
+			if (foe.num_charges <= 1) {
+				foe.is_alive = false;
+				var index = enemies.indexOf( foe );
+				if (index > -1) {
+					enemies.splice(index, 1);
+				}
+				endBattle(foe);
 			}
 			
-			endBattle(foe);
+			foe.loseCharge();
+			
 		}
 	}
 }
@@ -822,6 +851,8 @@ function generateHealthMeter () {
 function endBattle ( foe ) {
 	battle_active = false;
 	foe.is_hit = false;
+	moveHand(hand.position.x, menu_text.position.y + 
+                           menu_text.height - 10);
 	mode = RUN;
 	count = 1;
 	clearBattleScreen();
@@ -849,8 +880,6 @@ function clearBattleScreen() {
 	}
 	
 	battle_stage.removeChild( current_enemy.state );
-	current_enemy = null;
-	//battle_stage = new PIXI.Container();
 	master_stage.removeChild( battle_stage ); 
 }
 
@@ -938,13 +967,14 @@ function Enemy(obj) {
     'use strict';
     if (typeof obj === "undefined") { // DEFAULT
 		this.id = 1;
+		this.num_charges = 3;
 		this.x = 750;
 		this.y = 500;
         this.state = createMovieClip( this.x, this.y, 1, 1, "Overworld_Bat", 1, 2 );
         this.name = "Bat";
 		this.health = 10;
 		this.health_meter = createSprite( 350, 400, .5, .5, ( "ex_meter10.png" ) );
-		this.attack = 3;
+		this.attack = 1;
 		this.speed = 2;
 		this.is_alive = true;
 		this.is_hit = false;
@@ -952,6 +982,7 @@ function Enemy(obj) {
 	
 	else {
 		this.id = obj.id;
+		this.num_charges = obj.num_charges;
 		this.x = obj.x;
 		this.y = obj.y;
         this.state = obj.state;
@@ -972,6 +1003,86 @@ function Enemy(obj) {
 */
 Enemy.prototype.updateHealthBar = function () {
     'use strict';
+	if ( this.num_charges > 0 ) {
+		if ( this.health <= 0 ) { this.health += 10; }
+	}
+	
+	threat_stage.removeChildren();
+	
+	switch ( this.num_charges ) {
+		case 10:
+				for ( var i = 10; i > 0; i-- ) {
+					danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
+					
+					threat_stage.addChild( danger_level );
+				}
+			break;
+		case 9:
+				for ( var i = 9; i > 0; i-- ) {
+					danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
+					
+					threat_stage.addChild( danger_level );
+				}
+			break;
+		case 8:
+				for ( var i = 8; i > 0; i-- ) {
+					danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
+					
+					threat_stage.addChild( danger_level );
+				}
+			break;
+		case 7:
+				for ( var i = 7; i > 0; i-- ) {
+					danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
+					
+					threat_stage.addChild( danger_level );
+				}
+			break;
+		case 6:
+			for ( var i = 6; i > 0; i-- ) {
+				danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
+				
+				threat_stage.addChild( danger_level );
+			}
+			break;
+		case 5:
+				for ( var i = 5; i > 0; i-- ) {
+					danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
+					
+					threat_stage.addChild( danger_level );
+				}
+			break;
+		case 4:
+			for ( var i = 4; i > 0; i-- ) {
+				danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
+				
+				threat_stage.addChild( danger_level );
+			}
+			break;
+		case 3:
+			for ( var i = 3; i > 0; i-- ) {
+				danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
+				
+				threat_stage.addChild( danger_level );
+			}
+			break;
+		case 2:
+				for ( var i = 2; i > 0; i-- ) {
+					danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
+					
+					threat_stage.addChild( danger_level );
+				}
+			break;
+		case 1:
+			for ( var i = 1; i > 0; i-- ) {
+				danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
+				
+				threat_stage.addChild( danger_level );
+			}
+			break;
+		
+	}
+	
     if ( this.health_meter != null ) {
 		battle_stage.removeChild( this.health_meter );
 	}
@@ -985,3 +1096,13 @@ Enemy.prototype.updateHealthBar = function () {
 		battle_stage.addChild( this.health_meter );
 	}
 };
+
+Enemy.prototype.addCharge = function () {
+	this.num_charges++;
+};
+
+Enemy.prototype.loseCharge = function () {
+	this.num_charges--;
+};
+
+
