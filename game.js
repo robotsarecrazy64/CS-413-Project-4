@@ -159,7 +159,7 @@ function generateBattleMenu()
 	  temp_y = player.position.y;
 	  temp_direction = playerDirection;
 	  
-	  swapPlayer( 100, 200, 5, 5, "PlayerRight", 1, 3 );
+	  swapPlayer( 100, 200, 5, 5, "PlayerAttack", 1, 5 );
 	  
 	  battle_stage.addChild( player );
 	  
@@ -705,12 +705,12 @@ function fight( foe ) { //Pass in enemy
 function playerAttack( foe ) {
 	if (player_alive) {
 		var player_attack = getRand(2) + 2;
-		alert("Your attack hit the enemy for " + player_attack + " damage.");
+		//alert("Your attack hit the enemy for " + player_attack + " damage.");
 		swapPlayer( 100, 200, 5, 5, "PlayerRight", 1, 3  );
 		foe.health -= player_attack;
 
 		if ( foe.health <= 0 ) { 
-			alert("The enemy has been slain."); 
+			//alert("The enemy has been slain."); 
 			foe.is_alive = false;
 			var index = enemies.indexOf( foe );
 			if (index > -1) {
@@ -730,16 +730,16 @@ function enemyAttack( foe ) {
 		var enemy_chance = getRand(10);
 		
 		if ( enemy_chance < 8 ) {
-			alert( "The enemy hits you for " + foe.attack + " damage." );
+			//alert( "The enemy hits you for " + foe.attack + " damage." );
 			player_health -= foe.attack;
 		}
 
 		else {
-			alert("The enemy misses their attack.");
+			//alert("The enemy misses their attack.");
 		}
 
 		if ( player_health <= 0 ) {
-			alert("You have fallen in battle. ;-;");
+			//alert("You have fallen in battle. ;-;");
 			game_stage.removeChild( player ); 
 			game_stage.removeChild( health_meter );
 			player.stop();
@@ -755,9 +755,9 @@ function enemyAttack( foe ) {
 function steal( foe ) {
 	var steal_chance = getRand(10);
 	if ( player_speed > foe.speed ) {
-		if ( steal_chance < 6 ) { alert("Couldn't steal."); } //50% chance
+		//if ( steal_chance < 6 ) { alert("Couldn't steal."); } //50% chance
 
-		else { alert("You have stolen <item> from enemy."); }
+		//else { alert("You have stolen <item> from enemy."); }
 
 		enemyAttack( foe );
 	}
@@ -765,9 +765,9 @@ function steal( foe ) {
 	else {
 		enemyAttack( foe );
 	
-		if ( steal_chance < 6 ) { alert("Couldn't steal."); } //50% chance
+		//if ( steal_chance < 6 ) { alert("Couldn't steal."); } //50% chance
 
-		else { alert("You have stolen <item> from enemy."); }	
+		//else { alert("You have stolen <item> from enemy."); }	
 	}
 }
 
@@ -775,7 +775,7 @@ function steal( foe ) {
 	Helper function that handles using an item action in combat
 */
 function useItem( foe ) {
-	alert("You drink a health potion.");
+	//alert("You drink a health potion.");
 	player_health += getRand(3) + 2; //30% - 50%
 	enemyAttack( foe );
 }
@@ -787,13 +787,12 @@ function run( foe ) {
 	var run_chance = getRand(10);
 	
 	if ( run_chance == 10 ) { //10% chance to fail
-		alert("Couldn't get away.");
+		//alert("Couldn't get away.");
 		enemyAttack( foe ); // run fail
 	}
 
 	else {
-        alert("You have escaped.");
-		alert( foe.name );
+        //alert("You have escaped.");
 		endBattle( foe ); // run success
 	}
 }
