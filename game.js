@@ -39,8 +39,10 @@ var temp_x;
 var temp_y;
 var temp_direction;
 var player_health = 10;
+var player_attack = 3;
 var health_meter;
 var player_alive = true;
+var player_boost = false;
 var player_armor = 1;
 var player_speed = 5;
 var enemy;
@@ -62,7 +64,19 @@ var world;
 var tu;
 var playerDirection;
 var npc12112_dialogue = [];
+var npc4114_dialogue = [];
+var npc17113_dialogue = [];
+var npc22117_dialogue = [];
+var npc20110_dialogue = [];
+var npc27110_dialogue = [];
+var npc27123_dialogue = [];
+var npc33121_dialogue = [];
+var npc34107_dialogue = [];
+var npc43107_dialogue = [];
+var npc4123_dialogue = [];
+var npc40121_dialogue = [];
 var currentDialogue = 0;
+var currentLine;
 var currentNPC = 0;
 var dialogueEnd = true;
 var dialogueBox;
@@ -91,7 +105,7 @@ const BAT = 1;
 const GOBLIN = 2;
 const PIXIE = 3;
 const OGRE = 4;
-const TREE_BOSS = 5;
+const EVIL_TREE = 5;
 const POSSESSED_SOLDIER = 6;
 const SKELETON = 7;
  
@@ -114,6 +128,7 @@ function generateLevel()
 	game_stage.addChild( player );
 	
 	enemy = new Enemy();
+	/*
 	enemy2 = new Enemy({id: GOBLIN,
 						num_charges: 1,
 						x: 700, 
@@ -121,7 +136,48 @@ function generateLevel()
 						state: createMovieClip( 700, 600, 1, 1, "Goblin", 1, 2 ), 
 						name: "Goblin", 
 						attack: 1, 
-						speed: 6});
+						speed: 6});*/
+	/*enemy2 = new Enemy({id: OGRE,
+						num_charges: 3,
+						x: 700, 
+						y: 600, 
+						state: createMovieClip( 700, 600, 1, 1, "Overworld_Ogre", 1, 3 ), 
+						name: "Ogre", 
+						attack: 3, 
+						speed: 2});*/
+	/*enemy2 = new Enemy({id: PIXIE,
+						num_charges: 2,
+						x: 700, 
+						y: 600, 
+						state: createMovieClip( 700, 600, 1, 1, "Overworld_Pixie", 1, 3 ), 
+						name: "Pixie", 
+						attack: 2, 
+						speed: 8});*/
+	/*enemy2 = new Enemy({id: POSSESSED_SOLDIER,
+						num_charges: 4,
+						x: 700, 
+						y: 600, 
+						state: createMovieClip( 700, 600, .6, .6, "Overworld_Possessed_Soldier", 1, 3 ), 
+						name: "Soldier", 
+						attack: 2, 
+						speed: 7});*/
+	/*enemy2 = new Enemy({id: SKELETON,
+						num_charges: 6,
+						x: 700, 
+						y: 600, 
+						state: createMovieClip( 700, 600, .8, .8, "Overworld_Skeleton", 1, 3 ), 
+						name: "Skeleton", 
+						attack: 4, 
+						speed: 5});*/
+	enemy2 = new Enemy({id: EVIL_TREE,
+						num_charges: 5,
+						x: 700, 
+						y: 600, 
+						state: createMovieClip( 700, 500, 1, 1, "Overworld_Evil Tree", 1, 3 ), 
+						name: "Evil Tree", 
+						attack: 4, 
+						speed: 8});
+		
 	enemies.push( enemy );
 	enemies.push( enemy2 );
    
@@ -181,12 +237,29 @@ function generateBattleMenu()
 	  battle_stage.addChild(current_enemy.health_meter);
 	  
 	  switch ( current_enemy.id ) {
-			case BAT:
-				current_enemy.state = createMovieClip( 250, 200, 1, 1, current_enemy.name, 1, 7 );
-				current_enemy.state.animationSpeed = 0.25;
-				break;
 			case GOBLIN:
 				current_enemy.state = createMovieClip( 250, 200, 5, 5, current_enemy.name, 1, 2 );
+				break;
+			case OGRE:
+				current_enemy.state = createMovieClip( 215, 125, 2, 2, current_enemy.name, 1, 3 );
+				break;
+			case PIXIE:
+				current_enemy.state = createMovieClip( 250, 200, 1, 1, current_enemy.name, 1, 5 );
+				break;
+			case POSSESSED_SOLDIER:
+				current_enemy.state = createMovieClip( 240, 175, 2, 2, current_enemy.name, 1, 3 );
+				break;
+			case SKELETON:
+				enemy_text.position.x -= 10;
+				current_enemy.state = createMovieClip( 250, 135, 1.25, 1.25, current_enemy.name, 1, 3 );
+				break;
+			case BAT:
+				current_enemy.state = createMovieClip( 225, 150, 2, 2, current_enemy.name, 1, 7 );
+				current_enemy.state.animationSpeed = 0.25;
+				break;
+			case EVIL_TREE:
+				enemy_text.position.x -= 10;
+				current_enemy.state = createMovieClip( 205, 75, 1, 1, current_enemy.name, 1, 3 );
 				break;
 	  }
 	  
@@ -487,10 +560,10 @@ function keydownEventHandler(event) {
             if( checkNPCInteraction() )
             {
                dialogueBox = createRoundedRect( 0, 400, 500, 100, 10, "white" );
-               dialogueText = new PIXI.Text(npc12112_dialogue[currentDialogue], 
-                  {fontFamily : 'Calibri', fontSize: 25, fill : 0xFFFFFF, align : 'center'});
-               dialogueText.y = 5;
-               dialogueText.y = 400;
+               dialogueText = new PIXI.Text(currentArray[currentDialogue], 
+                  {fontFamily : 'Calibri', fontSize: 25, fill : 0xFFFFFF, align : 'left'});
+               dialogueText.x = 5;
+               dialogueText.y = 405;
                currentDialogue++;
    
                master_stage.addChild( dialogueBox );
@@ -534,14 +607,6 @@ function keydownEventHandler(event) {
             {
                iterateDialogue();
             }
-            
-            else
-            {
-               dialogue_active = false;
-               master_stage.removeChild( dialogueBox );
-               master_stage.removeChild( dialogueText );
-               currentDialogue = 0;
-            }
          }
       }
    }
@@ -551,7 +616,18 @@ function keydownEventHandler(event) {
 function checkNPCInteraction()
 {
    // NPC at 12, 112
-   return checkValidInteraction( 12, 112 );
+   return checkValidInteraction( 12, 112 ) ||
+          checkValidInteraction( 4, 114 ) ||
+          checkValidInteraction( 17, 113 ) ||
+          checkValidInteraction( 22, 117 ) ||
+          checkValidInteraction( 20, 110 ) ||
+          checkValidInteraction( 27, 110 ) ||
+          checkValidInteraction( 27, 123 ) ||
+          checkValidInteraction( 33, 121 ) ||
+          checkValidInteraction( 34, 107 ) ||
+          checkValidInteraction( 43, 107 ) ||
+          checkValidInteraction( 4, 123 ) ||
+          checkValidInteraction( 40, 121 );
 }
 
 
@@ -570,37 +646,145 @@ function checkValidInteraction( npcX, npcY )
        (playerDirection == RIGHT && 
        npcX * 25 - 25 == player.x && npcY * 25 == player.y)  )
    {
-      currentNPC = 12112;
+      currentNPC = parseInt("" + npcX + npcY);
+      getCurrentLine();
       return true;
    }
 }
 
 
-function iterateDialogue()
+function getCurrentLine()
 {
    switch( currentNPC )
    {
       case 12112:
-         dialogueText.setText(npc12112_dialogue[currentDialogue]);
-         currentDialogue++;
-         
-         if( currentDialogue == npc12112_dialogue.length )
-         {
-            dialogueEnd = true;
-         }
-         
+         currentArray = npc12112_dialogue;
          break;
+      case 4114:
+         currentArray = npc4114_dialogue;
+         break;
+      case 17113:
+         currentArray = npc17113_dialogue;
+         break;
+      case 22117:
+         currentArray = npc22117_dialogue;
+         break;
+      case 20110:
+         currentArray = npc20110_dialogue;
+         break;
+      case 27110:
+         currentArray = npc27110_dialogue;
+         break;
+      case 27123:
+         currentArray = npc27123_dialogue;
+         break;
+      case 33121:
+         currentArray = npc33121_dialogue;
+         break;
+      case 34107:
+         currentArray = npc34107_dialogue;
+         break;
+      case 43107:
+         currentArray = npc43107_dialogue;
+         break;
+      case 4123:
+         currentArray = npc4123_dialogue;
+         break;
+      case 40121:
+         currentArray = npc40121_dialogue;
+         break;  
+   }
+}
+
+
+function iterateDialogue()
+{    
+   if( currentDialogue == currentArray.length )
+   {
+      dialogueEnd = true;
+      dialogue_active = false;
+      master_stage.removeChild( dialogueBox );
+      master_stage.removeChild( dialogueText );
+      currentDialogue = 0;
+   }
+   
+   else
+   {
+      dialogueText.setText(currentArray[currentDialogue]);
+      currentDialogue++;
    }
 }
 
 
 function initialize_npc_dialogue()
-{  
-   npc12112_dialogue.push( "hey" );
-   npc12112_dialogue.push( "hello" );
-   npc12112_dialogue.push( "test" );
-   npc12112_dialogue.push( "press" );
-   npc12112_dialogue.push( "enter" );
+{  // Needs enter when longer than --------------------------------
+   npc12112_dialogue.push( "I'm the town's blacksmith, but I\n"+
+                           "graduated with a degree in literature..." );
+   npc12112_dialogue.push( "I've honed my craft over the years\n"+
+                           "though!" );
+   
+   npc4114_dialogue.push( "I am a town guard, I help keep this\n"+
+                          "place safe!" );
+   
+   npc17113_dialogue.push( "Oh someone help us! There is a great\n"+
+                           "evil that wishes to destory us all!\n" );
+   npc17113_dialogue.push( "You there, please help! There is a\n"+
+                           "monster that is going to wipe out the\n"+
+                           "world!" );
+   npc17113_dialogue.push( "She may look like a regular woman,\n"+
+                           "but she is the devil incarnate! Please\n"+
+                           "help us!" );
+   npc17113_dialogue.push( "You would be hailed a hero if she were\n"+
+                           "slain by your hand!" );
+   
+   npc22117_dialogue.push( "If I jump into the pond and swam\n"+
+                           "far away, would anyone chase after\n" +
+                           "me?" );
+   
+   npc20110_dialogue.push( "I love looking in the water and seeing\n"+
+                           "my reflection looking back!" );
+   npc20110_dialogue.push( "It's kinda creepy when she smiles back\n"+
+                           "and I'm not...");
+   
+   npc27110_dialogue.push( "My wife accused me of sneaking off to\n"+
+                           "try and slay the monster!" );
+   npc27110_dialogue.push( "All I was trying to do was surprise\n"+
+                           "her with flowers..." );
+  
+   npc27123_dialogue.push( "I am unsure how I am able to walk on\n"+
+                           "water..." );
+   npc27123_dialogue.push( "This is a precarious situation. \n"+
+                           "One second me and Billy were\n" +
+                           "walking around the pond. I tried\n" );
+   npc27123_dialogue.push( "to splash him by jumping.\n"  +
+                           "Low and behold the water did not \n" );
+   npc27123_dialogue.push( "move. I ventured slightly further\n" +
+                           "and ended up here.\n" +
+                           "Where did Billy dash off to though?\n" );
+   npc27123_dialogue.push( "In my glee of waterwalking, he\n" +
+                           "vanished... I hope the monster did\n" +
+                           "not get him!" );
+   npc27123_dialogue.push( "I must go, if the others see this\n"+
+                           "I may be tried for witchcraft.\n" +
+                           "They cannot comprehend my gift. \n" );
+   
+   npc33121_dialogue.push( "hey6" );
+   
+   npc34107_dialogue.push( "Hello citizen, have no fear, Town\n" +
+                           "Guard is here! Oh, you are going\n" +
+                           "to be a hero and slay the monster?" );
+   npc34107_dialogue.push( "Right... good luck with that." );
+   
+   npc43107_dialogue.push( "I'll say nice things at the\n" +
+                           "funeral. It's too dangerous for\n"+
+                           "anyone to survive out there." );
+   
+   npc4123_dialogue.push( "Oh my, a dashing young hero to save\n" +
+                          "us all! Thank you youngster. Now I\n"+
+                          "can tend to my crops again." );
+   
+   npc40121_dialogue.push( "hey0" );   
+   
 }
 
 
@@ -716,8 +900,8 @@ function fight( foe ) { //Pass in enemy
 */
 function playerAttack( foe ) {
 	if (player_alive) {
-		var player_attack = getRand(2) + 2;
 		//alert("Your attack hit the enemy for " + player_attack + " damage.");
+		/**
 		swapPlayer( 100, 200, 5, 5, "PlayerAttack", 1, 3  );
 		player.loop = false;
 		player.onComplete = swapPlayer( 100, 200, 5, 5, "PlayerRight", 1, 3  );
@@ -731,9 +915,13 @@ function playerAttack( foe ) {
 			foe.gotoAndStop(0);
 		};
 		
-		foe.onComplete = animationFinished;
+		foe.onComplete = animationFinished;*/
 
 		foe.health -= player_attack;
+		
+		if( player_boost ) {
+			player_health--;
+		}
 
 		if ( foe.health <= 0 ) { 
 			
@@ -784,22 +972,27 @@ function enemyAttack( foe ) {
 	Helper function that handles steal action in combat
 */
 function steal( foe ) {
-	var steal_chance = getRand(10);
-	if ( player_speed > foe.speed ) {
-		//if ( steal_chance < 6 ) { alert("Couldn't steal."); } //50% chance
-
-		//else { alert("You have stolen <item> from enemy."); }
-
-		enemyAttack( foe );
+	if( player_speed > foe.speed ) {
+			if(!player_boost) {
+			player_boost = true;
+			player_attack *= 2;
+	}
+	
+		if ( player_alive && foe.is_alive ) {
+			enemyAttack( foe ); //Pass in enemy
+		}
 	}
 
 	else {
-		enemyAttack( foe );
+		if ( player_alive && foe.is_alive ) {
+			enemyAttack( foe ); //Pass in enemy
+		}
 	
-		//if ( steal_chance < 6 ) { alert("Couldn't steal."); } //50% chance
-
-		//else { alert("You have stolen <item> from enemy."); }	
-	}
+		if(!player_boost) {
+			player_boost = true;
+			player_attack *= 2;
+		}
+  }
 }
 
 /**
@@ -850,7 +1043,7 @@ function generateHealthMeter () {
 	if ( player_health > 10 ) { player_health = 10; }
 
 	if ( player_alive ) {
-		health_meter = createSprite( player.position.x - 100, player.position.y + 200, .5, .5, ( "ex_meter" + player_health + ".png" ) );
+		health_meter = createSprite( player.position.x - 100, player.position.y + 200, .5, .5, ( "ex_meter" + ( Math.round( player_health ) ) + ".png" ) );
 		battle_stage.addChild( health_meter );
 	}
 }
@@ -861,10 +1054,13 @@ function generateHealthMeter () {
 function endBattle ( foe ) {
 	battle_active = false;
 	foe.is_hit = false;
+	player_boost = false;
+	player_attack /= 2;
 	moveHand(hand.position.x, menu_text.position.y + 
                            menu_text.height - 10);
 	mode = RUN;
 	count = 1;
+	foe.removeEnemy();
 	clearBattleScreen();
 }
 
@@ -977,15 +1173,16 @@ function Enemy(obj) {
     'use strict';
     if (typeof obj === "undefined") { // DEFAULT
 		this.id = 1;
-		this.num_charges = 3;
+		this.num_charges = 4;
 		this.x = 750;
 		this.y = 500;
-        this.state = createMovieClip( this.x, this.y, 1, 1, "Overworld_Bat", 1, 2 );
+        this.state = createMovieClip( this.x, this.y, .6, .6, "Bat", 1, 7 );
+		this.state.animationSpeed = 0.25;
         this.name = "Bat";
 		this.health = 10;
 		this.health_meter = createSprite( 350, 400, .5, .5, ( "ex_meter10.png" ) );
-		this.attack = 1;
-		this.speed = 2;
+		this.attack = 4;
+		this.speed = 8;
 		this.is_alive = true;
 		this.is_hit = false;
     } 
@@ -1034,7 +1231,7 @@ Enemy.prototype.updateHealthBar = function () {
 	if ( this.health > 10 ) { this.health = 10; }
 	
 	if ( this.is_alive ) {
-		this.health_meter = createSprite( 350, 400, .5, .5, ( "ex_meter" + this.health + ".png" ) );
+		this.health_meter = createSprite( 350, 400, .5, .5, ( "ex_meter" + ( Math.round( this.health ) ) + ".png" ) );
 		battle_stage.addChild( this.health_meter );
 	}
 };
@@ -1045,6 +1242,13 @@ Enemy.prototype.addCharge = function () {
 
 Enemy.prototype.loseCharge = function () {
 	this.num_charges--;
+};
+
+Enemy.prototype.removeEnemy = function () {
+	this.state.visible = false;
+	this.state.stop();
+	this.state.destroy();
+	game_stage.removeChild( this.state );
 };
 
 
