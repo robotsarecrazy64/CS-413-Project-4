@@ -26,7 +26,7 @@
             </struct>
         </array>
         <key>allowRotation</key>
-        <true/>
+        <false/>
         <key>shapeDebug</key>
         <false/>
         <key>dpi</key>
@@ -177,12 +177,28 @@
             <key>defaultPivotPoint</key>
             <point_f>0,0</point_f>
             <key>writePivotPoints</key>
-            <true/>
+            <false/>
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
             <key type="filename">Bat1.png</key>
             <key type="filename">Bat2.png</key>
+            <key type="filename">Bat3.png</key>
+            <key type="filename">Bat4.png</key>
+            <key type="filename">Bat5.png</key>
+            <key type="filename">Bat6.png</key>
+            <key type="filename">Bat7.png</key>
+            <key type="filename">Batdamage_01.png</key>
+            <key type="filename">Batdamage_02.png</key>
+            <key type="filename">Batdamage_03.png</key>
+            <key type="filename">Ogre1.png</key>
+            <key type="filename">Ogre2.png</key>
+            <key type="filename">Ogre3.png</key>
+            <key type="filename">Pixie1.png</key>
+            <key type="filename">Pixie2.png</key>
+            <key type="filename">Pixie3.png</key>
+            <key type="filename">Pixie4.png</key>
+            <key type="filename">Pixie5.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -199,18 +215,33 @@
             <key type="filename">Goblin2.png</key>
             <key type="filename">Overworld_Bat1.png</key>
             <key type="filename">Overworld_Bat2.png</key>
-            <key type="filename">Player down1.png</key>
-            <key type="filename">Player down2.png</key>
-            <key type="filename">Player down3.png</key>
-            <key type="filename">Player left1.png</key>
-            <key type="filename">Player left2.png</key>
-            <key type="filename">Player left3.png</key>
-            <key type="filename">Player right1.png</key>
-            <key type="filename">Player right2.png</key>
-            <key type="filename">Player right3.png</key>
-            <key type="filename">Player up1.png</key>
-            <key type="filename">Player up2.png</key>
-            <key type="filename">Player up3.png</key>
+            <key type="filename">Overworld_Pixie1.png</key>
+            <key type="filename">Overworld_Pixie2.png</key>
+            <key type="filename">Overworld_Pixie3.png</key>
+            <key type="filename">Overworld_Pixie4.png</key>
+            <key type="filename">Overworld_Pixie5.png</key>
+            <key type="filename">PlayerAttack1.png</key>
+            <key type="filename">PlayerAttack2.png</key>
+            <key type="filename">PlayerAttack3.png</key>
+            <key type="filename">PlayerAttack4.png</key>
+            <key type="filename">PlayerAttack5.png</key>
+            <key type="filename">PlayerAttack_01.png</key>
+            <key type="filename">PlayerAttack_02.png</key>
+            <key type="filename">PlayerAttack_03.png</key>
+            <key type="filename">PlayerAttack_04.png</key>
+            <key type="filename">PlayerAttack_05.png</key>
+            <key type="filename">PlayerDown1.png</key>
+            <key type="filename">PlayerDown2.png</key>
+            <key type="filename">PlayerDown3.png</key>
+            <key type="filename">PlayerLeft1.png</key>
+            <key type="filename">PlayerLeft2.png</key>
+            <key type="filename">PlayerLeft3.png</key>
+            <key type="filename">PlayerRight1.png</key>
+            <key type="filename">PlayerRight2.png</key>
+            <key type="filename">PlayerRight3.png</key>
+            <key type="filename">PlayerUp1.png</key>
+            <key type="filename">PlayerUp2.png</key>
+            <key type="filename">PlayerUp3.png</key>
             <key type="filename">downarrow.png</key>
             <key type="filename">leftarrow.png</key>
             <key type="filename">rightarrow.png</key>
@@ -227,6 +258,60 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">Goblindamage1.png</key>
+            <key type="filename">Goblindamage2.png</key>
+            <key type="filename">Goblindamage3.png</key>
+            <key type="filename">PlayerStartDown1.png</key>
+            <key type="filename">PlayerStartDown2.png</key>
+            <key type="filename">PlayerStartDown3.png</key>
+            <key type="filename">PlayerStartLeft1.png</key>
+            <key type="filename">PlayerStartLeft2.png</key>
+            <key type="filename">PlayerStartLeft3.png</key>
+            <key type="filename">PlayerStartRight1.png</key>
+            <key type="filename">PlayerStartRight2.png</key>
+            <key type="filename">PlayerStartRight3.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0,0</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>6,6,13,13</rect>
+                <key>scale9Paddings</key>
+                <rect>6,6,13,13</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">Overworld_Ogre1.png</key>
+            <key type="filename">Overworld_Ogre2.png</key>
+            <key type="filename">Overworld_Ogre3.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>13,13,25,25</rect>
+                <key>scale9Paddings</key>
+                <rect>13,13,25,25</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">Overworld_Possessed_Soldier1.png</key>
+            <key type="filename">Overworld_Possessed_Soldier2.png</key>
+            <key type="filename">Overworld_Possessed_Soldier3.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>19,13,37,25</rect>
+                <key>scale9Paddings</key>
+                <rect>19,13,37,25</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
             <key type="filename">Overworld_Skeleton.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
@@ -237,6 +322,21 @@
                 <rect>4,6,8,13</rect>
                 <key>scale9Paddings</key>
                 <rect>4,6,8,13</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">Possessed_Soldier1.png</key>
+            <key type="filename">Possessed_Soldier2.png</key>
+            <key type="filename">Possessed_Soldier3.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>31,21,63,41</rect>
+                <key>scale9Paddings</key>
+                <rect>31,21,63,41</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
@@ -263,6 +363,23 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">laughing_skull1.png</key>
+            <key type="filename">laughing_skull2.png</key>
+            <key type="filename">laughing_skull3.png</key>
+            <key type="filename">laughing_skull4.png</key>
+            <key type="filename">laughing_skull5.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0,0</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>13,13,25,25</rect>
+                <key>scale9Paddings</key>
+                <rect>13,13,25,25</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
         </map>
         <key>fileList</key>
         <array>
@@ -281,32 +398,91 @@
             <filename>leftarrow.png</filename>
             <filename>rightarrow.png</filename>
             <filename>uparrow.png</filename>
-            <filename>Player down1.png</filename>
-            <filename>Player down2.png</filename>
-            <filename>Player down3.png</filename>
-            <filename>Player left1.png</filename>
-            <filename>Player left2.png</filename>
-            <filename>Player left3.png</filename>
-            <filename>Player right1.png</filename>
-            <filename>Player right2.png</filename>
-            <filename>Player right3.png</filename>
-            <filename>Player up1.png</filename>
-            <filename>Player up2.png</filename>
-            <filename>Player up3.png</filename>
             <filename>Goblin1.png</filename>
             <filename>Goblin2.png</filename>
             <filename>Overworld_Skeleton.png</filename>
-            <filename>Bat1.png</filename>
-            <filename>Bat2.png</filename>
             <filename>Overworld_Bat1.png</filename>
             <filename>Overworld_Bat2.png</filename>
+            <filename>Bat2.png</filename>
+            <filename>Bat3.png</filename>
+            <filename>Bat4.png</filename>
+            <filename>Bat5.png</filename>
+            <filename>Bat6.png</filename>
+            <filename>Bat7.png</filename>
+            <filename>Batdamage_01.png</filename>
+            <filename>Batdamage_02.png</filename>
+            <filename>Batdamage_03.png</filename>
+            <filename>Bat1.png</filename>
+            <filename>Overworld_Ogre2.png</filename>
+            <filename>Overworld_Ogre3.png</filename>
+            <filename>Ogre1.png</filename>
+            <filename>Ogre2.png</filename>
+            <filename>Ogre3.png</filename>
+            <filename>Overworld_Ogre1.png</filename>
+            <filename>Overworld_Pixie2.png</filename>
+            <filename>Overworld_Pixie3.png</filename>
+            <filename>Overworld_Pixie4.png</filename>
+            <filename>Overworld_Pixie5.png</filename>
+            <filename>Overworld_Pixie1.png</filename>
+            <filename>Overworld_Possessed_Soldier3.png</filename>
+            <filename>Overworld_Possessed_Soldier1.png</filename>
+            <filename>Overworld_Possessed_Soldier2.png</filename>
+            <filename>Pixie5.png</filename>
+            <filename>Pixie1.png</filename>
+            <filename>Pixie2.png</filename>
+            <filename>Pixie3.png</filename>
+            <filename>Pixie4.png</filename>
+            <filename>Possessed_Soldier3.png</filename>
+            <filename>Possessed_Soldier1.png</filename>
+            <filename>Possessed_Soldier2.png</filename>
+            <filename>PlayerUp3.png</filename>
+            <filename>PlayerUp1.png</filename>
+            <filename>PlayerUp2.png</filename>
+            <filename>PlayerRight3.png</filename>
+            <filename>PlayerLeft3.png</filename>
+            <filename>PlayerRight1.png</filename>
+            <filename>PlayerRight2.png</filename>
+            <filename>PlayerAttack3.png</filename>
+            <filename>PlayerAttack4.png</filename>
+            <filename>PlayerAttack5.png</filename>
+            <filename>PlayerDown1.png</filename>
+            <filename>PlayerDown2.png</filename>
+            <filename>PlayerDown3.png</filename>
+            <filename>PlayerLeft1.png</filename>
+            <filename>PlayerLeft2.png</filename>
+            <filename>PlayerAttack_01.png</filename>
+            <filename>PlayerAttack_02.png</filename>
+            <filename>PlayerAttack_03.png</filename>
+            <filename>PlayerAttack_04.png</filename>
+            <filename>PlayerAttack_05.png</filename>
+            <filename>PlayerAttack1.png</filename>
+            <filename>PlayerAttack2.png</filename>
+            <filename>PlayerStartDown3.png</filename>
+            <filename>PlayerStartLeft1.png</filename>
+            <filename>PlayerStartLeft2.png</filename>
+            <filename>PlayerStartLeft3.png</filename>
+            <filename>PlayerStartRight1.png</filename>
+            <filename>PlayerStartRight2.png</filename>
+            <filename>PlayerStartRight3.png</filename>
+            <filename>PlayerStartDown1.png</filename>
+            <filename>PlayerStartDown2.png</filename>
+            <filename>laughing_skull1.png</filename>
+            <filename>laughing_skull2.png</filename>
+            <filename>laughing_skull3.png</filename>
+            <filename>laughing_skull4.png</filename>
+            <filename>laughing_skull5.png</filename>
+            <filename>Goblindamage2.png</filename>
+            <filename>Goblindamage3.png</filename>
+            <filename>Goblindamage1.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
         <key>replaceList</key>
         <array/>
         <key>ignoredWarnings</key>
-        <array/>
+        <array>
+            <string>try-pro-features</string>
+        </array>
         <key>commonDivisorX</key>
         <uint>1</uint>
         <key>commonDivisorY</key>
