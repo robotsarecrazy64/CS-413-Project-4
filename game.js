@@ -39,8 +39,10 @@ var temp_x;
 var temp_y;
 var temp_direction;
 var player_health = 10;
+var player_attack = 3;
 var health_meter;
 var player_alive = true;
+var player_boost = false;
 var player_armor = 1;
 var player_speed = 5;
 var enemy;
@@ -91,7 +93,7 @@ const BAT = 1;
 const GOBLIN = 2;
 const PIXIE = 3;
 const OGRE = 4;
-const TREE_BOSS = 5;
+const EVIL_TREE = 5;
 const POSSESSED_SOLDIER = 6;
 const SKELETON = 7;
  
@@ -114,6 +116,7 @@ function generateLevel()
 	game_stage.addChild( player );
 	
 	enemy = new Enemy();
+	/*
 	enemy2 = new Enemy({id: GOBLIN,
 						num_charges: 1,
 						x: 700, 
@@ -121,7 +124,48 @@ function generateLevel()
 						state: createMovieClip( 700, 600, 1, 1, "Goblin", 1, 2 ), 
 						name: "Goblin", 
 						attack: 1, 
-						speed: 6});
+						speed: 6});*/
+	/*enemy2 = new Enemy({id: OGRE,
+						num_charges: 3,
+						x: 700, 
+						y: 600, 
+						state: createMovieClip( 700, 600, 1, 1, "Overworld_Ogre", 1, 3 ), 
+						name: "Ogre", 
+						attack: 3, 
+						speed: 2});*/
+	/*enemy2 = new Enemy({id: PIXIE,
+						num_charges: 2,
+						x: 700, 
+						y: 600, 
+						state: createMovieClip( 700, 600, 1, 1, "Overworld_Pixie", 1, 3 ), 
+						name: "Pixie", 
+						attack: 2, 
+						speed: 8});*/
+	/*enemy2 = new Enemy({id: POSSESSED_SOLDIER,
+						num_charges: 4,
+						x: 700, 
+						y: 600, 
+						state: createMovieClip( 700, 600, .6, .6, "Overworld_Possessed_Soldier", 1, 3 ), 
+						name: "Soldier", 
+						attack: 2, 
+						speed: 7});*/
+	/*enemy2 = new Enemy({id: SKELETON,
+						num_charges: 6,
+						x: 700, 
+						y: 600, 
+						state: createMovieClip( 700, 600, .8, .8, "Overworld_Skeleton", 1, 3 ), 
+						name: "Skeleton", 
+						attack: 4, 
+						speed: 5});*/
+	enemy2 = new Enemy({id: EVIL_TREE,
+						num_charges: 5,
+						x: 700, 
+						y: 600, 
+						state: createMovieClip( 700, 500, 1, 1, "Overworld_Evil Tree", 1, 3 ), 
+						name: "Evil Tree", 
+						attack: 4, 
+						speed: 8});
+		
 	enemies.push( enemy );
 	enemies.push( enemy2 );
    
@@ -181,12 +225,29 @@ function generateBattleMenu()
 	  battle_stage.addChild(current_enemy.health_meter);
 	  
 	  switch ( current_enemy.id ) {
-			case BAT:
-				current_enemy.state = createMovieClip( 250, 200, 1, 1, current_enemy.name, 1, 7 );
-				current_enemy.state.animationSpeed = 0.25;
-				break;
 			case GOBLIN:
 				current_enemy.state = createMovieClip( 250, 200, 5, 5, current_enemy.name, 1, 2 );
+				break;
+			case OGRE:
+				current_enemy.state = createMovieClip( 215, 125, 2, 2, current_enemy.name, 1, 3 );
+				break;
+			case PIXIE:
+				current_enemy.state = createMovieClip( 250, 200, 1, 1, current_enemy.name, 1, 5 );
+				break;
+			case POSSESSED_SOLDIER:
+				current_enemy.state = createMovieClip( 240, 175, 2, 2, current_enemy.name, 1, 3 );
+				break;
+			case SKELETON:
+				enemy_text.position.x -= 10;
+				current_enemy.state = createMovieClip( 250, 135, 1.25, 1.25, current_enemy.name, 1, 3 );
+				break;
+			case BAT:
+				current_enemy.state = createMovieClip( 225, 150, 2, 2, current_enemy.name, 1, 7 );
+				current_enemy.state.animationSpeed = 0.25;
+				break;
+			case EVIL_TREE:
+				enemy_text.position.x -= 10;
+				current_enemy.state = createMovieClip( 205, 75, 1, 1, current_enemy.name, 1, 3 );
 				break;
 	  }
 	  
@@ -716,8 +777,8 @@ function fight( foe ) { //Pass in enemy
 */
 function playerAttack( foe ) {
 	if (player_alive) {
-		var player_attack = getRand(2) + 2;
 		//alert("Your attack hit the enemy for " + player_attack + " damage.");
+		/**
 		swapPlayer( 100, 200, 5, 5, "PlayerAttack", 1, 3  );
 		player.loop = false;
 		player.onComplete = swapPlayer( 100, 200, 5, 5, "PlayerRight", 1, 3  );
@@ -731,9 +792,13 @@ function playerAttack( foe ) {
 			foe.gotoAndStop(0);
 		};
 		
-		foe.onComplete = animationFinished;
+		foe.onComplete = animationFinished;*/
 
 		foe.health -= player_attack;
+		
+		if( player_boost ) {
+			player_health--;
+		}
 
 		if ( foe.health <= 0 ) { 
 			
@@ -784,22 +849,27 @@ function enemyAttack( foe ) {
 	Helper function that handles steal action in combat
 */
 function steal( foe ) {
-	var steal_chance = getRand(10);
-	if ( player_speed > foe.speed ) {
-		//if ( steal_chance < 6 ) { alert("Couldn't steal."); } //50% chance
-
-		//else { alert("You have stolen <item> from enemy."); }
-
-		enemyAttack( foe );
+	if( player_speed > foe.speed ) {
+			if(!player_boost) {
+			player_boost = true;
+			player_attack *= 2;
+	}
+	
+		if ( player_alive && foe.is_alive ) {
+			enemyAttack( foe ); //Pass in enemy
+		}
 	}
 
 	else {
-		enemyAttack( foe );
+		if ( player_alive && foe.is_alive ) {
+			enemyAttack( foe ); //Pass in enemy
+		}
 	
-		//if ( steal_chance < 6 ) { alert("Couldn't steal."); } //50% chance
-
-		//else { alert("You have stolen <item> from enemy."); }	
-	}
+		if(!player_boost) {
+			player_boost = true;
+			player_attack *= 2;
+		}
+  }
 }
 
 /**
@@ -850,7 +920,7 @@ function generateHealthMeter () {
 	if ( player_health > 10 ) { player_health = 10; }
 
 	if ( player_alive ) {
-		health_meter = createSprite( player.position.x - 100, player.position.y + 200, .5, .5, ( "ex_meter" + player_health + ".png" ) );
+		health_meter = createSprite( player.position.x - 100, player.position.y + 200, .5, .5, ( "ex_meter" + ( Math.round( player_health ) ) + ".png" ) );
 		battle_stage.addChild( health_meter );
 	}
 }
@@ -861,10 +931,13 @@ function generateHealthMeter () {
 function endBattle ( foe ) {
 	battle_active = false;
 	foe.is_hit = false;
+	player_boost = false;
+	player_attack /= 2;
 	moveHand(hand.position.x, menu_text.position.y + 
                            menu_text.height - 10);
 	mode = RUN;
 	count = 1;
+	foe.removeEnemy();
 	clearBattleScreen();
 }
 
@@ -977,15 +1050,16 @@ function Enemy(obj) {
     'use strict';
     if (typeof obj === "undefined") { // DEFAULT
 		this.id = 1;
-		this.num_charges = 3;
+		this.num_charges = 4;
 		this.x = 750;
 		this.y = 500;
-        this.state = createMovieClip( this.x, this.y, 1, 1, "Overworld_Bat", 1, 2 );
+        this.state = createMovieClip( this.x, this.y, .6, .6, "Bat", 1, 7 );
+		this.state.animationSpeed = 0.25;
         this.name = "Bat";
 		this.health = 10;
 		this.health_meter = createSprite( 350, 400, .5, .5, ( "ex_meter10.png" ) );
-		this.attack = 1;
-		this.speed = 2;
+		this.attack = 4;
+		this.speed = 8;
 		this.is_alive = true;
 		this.is_hit = false;
     } 
@@ -1034,7 +1108,7 @@ Enemy.prototype.updateHealthBar = function () {
 	if ( this.health > 10 ) { this.health = 10; }
 	
 	if ( this.is_alive ) {
-		this.health_meter = createSprite( 350, 400, .5, .5, ( "ex_meter" + this.health + ".png" ) );
+		this.health_meter = createSprite( 350, 400, .5, .5, ( "ex_meter" + ( Math.round( this.health ) ) + ".png" ) );
 		battle_stage.addChild( this.health_meter );
 	}
 };
@@ -1045,6 +1119,13 @@ Enemy.prototype.addCharge = function () {
 
 Enemy.prototype.loseCharge = function () {
 	this.num_charges--;
+};
+
+Enemy.prototype.removeEnemy = function () {
+	this.state.visible = false;
+	this.state.stop();
+	this.state.destroy();
+	game_stage.removeChild( this.state );
 };
 
 
