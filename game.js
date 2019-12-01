@@ -1009,78 +1009,10 @@ Enemy.prototype.updateHealthBar = function () {
 	
 	threat_stage.removeChildren();
 	
-	switch ( this.num_charges ) {
-		case 10:
-				for ( var i = 10; i > 0; i-- ) {
-					danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
-					
-					threat_stage.addChild( danger_level );
-				}
-			break;
-		case 9:
-				for ( var i = 9; i > 0; i-- ) {
-					danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
-					
-					threat_stage.addChild( danger_level );
-				}
-			break;
-		case 8:
-				for ( var i = 8; i > 0; i-- ) {
-					danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
-					
-					threat_stage.addChild( danger_level );
-				}
-			break;
-		case 7:
-				for ( var i = 7; i > 0; i-- ) {
-					danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
-					
-					threat_stage.addChild( danger_level );
-				}
-			break;
-		case 6:
-			for ( var i = 6; i > 0; i-- ) {
+	for ( var i = this.num_charges; i > 0; i-- ) {
 				danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
 				
 				threat_stage.addChild( danger_level );
-			}
-			break;
-		case 5:
-				for ( var i = 5; i > 0; i-- ) {
-					danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
-					
-					threat_stage.addChild( danger_level );
-				}
-			break;
-		case 4:
-			for ( var i = 4; i > 0; i-- ) {
-				danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
-				
-				threat_stage.addChild( danger_level );
-			}
-			break;
-		case 3:
-			for ( var i = 3; i > 0; i-- ) {
-				danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
-				
-				threat_stage.addChild( danger_level );
-			}
-			break;
-		case 2:
-				for ( var i = 2; i > 0; i-- ) {
-					danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
-					
-					threat_stage.addChild( danger_level );
-				}
-			break;
-		case 1:
-			for ( var i = 1; i > 0; i-- ) {
-				danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
-				
-				threat_stage.addChild( danger_level );
-			}
-			break;
-		
 	}
 	
     if ( this.health_meter != null ) {
