@@ -64,7 +64,19 @@ var world;
 var tu;
 var playerDirection;
 var npc12112_dialogue = [];
+var npc4114_dialogue = [];
+var npc17113_dialogue = [];
+var npc22117_dialogue = [];
+var npc20110_dialogue = [];
+var npc27110_dialogue = [];
+var npc27123_dialogue = [];
+var npc33121_dialogue = [];
+var npc34107_dialogue = [];
+var npc43107_dialogue = [];
+var npc4123_dialogue = [];
+var npc40121_dialogue = [];
 var currentDialogue = 0;
+var currentLine;
 var currentNPC = 0;
 var dialogueEnd = true;
 var dialogueBox;
@@ -548,10 +560,10 @@ function keydownEventHandler(event) {
             if( checkNPCInteraction() )
             {
                dialogueBox = createRoundedRect( 0, 400, 500, 100, 10, "white" );
-               dialogueText = new PIXI.Text(npc12112_dialogue[currentDialogue], 
-                  {fontFamily : 'Calibri', fontSize: 25, fill : 0xFFFFFF, align : 'center'});
-               dialogueText.y = 5;
-               dialogueText.y = 400;
+               dialogueText = new PIXI.Text(currentArray[currentDialogue], 
+                  {fontFamily : 'Calibri', fontSize: 25, fill : 0xFFFFFF, align : 'left'});
+               dialogueText.x = 5;
+               dialogueText.y = 405;
                currentDialogue++;
    
                master_stage.addChild( dialogueBox );
@@ -595,14 +607,6 @@ function keydownEventHandler(event) {
             {
                iterateDialogue();
             }
-            
-            else
-            {
-               dialogue_active = false;
-               master_stage.removeChild( dialogueBox );
-               master_stage.removeChild( dialogueText );
-               currentDialogue = 0;
-            }
          }
       }
    }
@@ -612,7 +616,18 @@ function keydownEventHandler(event) {
 function checkNPCInteraction()
 {
    // NPC at 12, 112
-   return checkValidInteraction( 12, 112 );
+   return checkValidInteraction( 12, 112 ) ||
+          checkValidInteraction( 4, 114 ) ||
+          checkValidInteraction( 17, 113 ) ||
+          checkValidInteraction( 22, 117 ) ||
+          checkValidInteraction( 20, 110 ) ||
+          checkValidInteraction( 27, 110 ) ||
+          checkValidInteraction( 27, 123 ) ||
+          checkValidInteraction( 33, 121 ) ||
+          checkValidInteraction( 34, 107 ) ||
+          checkValidInteraction( 43, 107 ) ||
+          checkValidInteraction( 4, 123 ) ||
+          checkValidInteraction( 40, 121 );
 }
 
 
@@ -631,37 +646,145 @@ function checkValidInteraction( npcX, npcY )
        (playerDirection == RIGHT && 
        npcX * 25 - 25 == player.x && npcY * 25 == player.y)  )
    {
-      currentNPC = 12112;
+      currentNPC = parseInt("" + npcX + npcY);
+      getCurrentLine();
       return true;
    }
 }
 
 
-function iterateDialogue()
+function getCurrentLine()
 {
    switch( currentNPC )
    {
       case 12112:
-         dialogueText.setText(npc12112_dialogue[currentDialogue]);
-         currentDialogue++;
-         
-         if( currentDialogue == npc12112_dialogue.length )
-         {
-            dialogueEnd = true;
-         }
-         
+         currentArray = npc12112_dialogue;
          break;
+      case 4114:
+         currentArray = npc4114_dialogue;
+         break;
+      case 17113:
+         currentArray = npc17113_dialogue;
+         break;
+      case 22117:
+         currentArray = npc22117_dialogue;
+         break;
+      case 20110:
+         currentArray = npc20110_dialogue;
+         break;
+      case 27110:
+         currentArray = npc27110_dialogue;
+         break;
+      case 27123:
+         currentArray = npc27123_dialogue;
+         break;
+      case 33121:
+         currentArray = npc33121_dialogue;
+         break;
+      case 34107:
+         currentArray = npc34107_dialogue;
+         break;
+      case 43107:
+         currentArray = npc43107_dialogue;
+         break;
+      case 4123:
+         currentArray = npc4123_dialogue;
+         break;
+      case 40121:
+         currentArray = npc40121_dialogue;
+         break;  
+   }
+}
+
+
+function iterateDialogue()
+{    
+   if( currentDialogue == currentArray.length )
+   {
+      dialogueEnd = true;
+      dialogue_active = false;
+      master_stage.removeChild( dialogueBox );
+      master_stage.removeChild( dialogueText );
+      currentDialogue = 0;
+   }
+   
+   else
+   {
+      dialogueText.setText(currentArray[currentDialogue]);
+      currentDialogue++;
    }
 }
 
 
 function initialize_npc_dialogue()
-{  
-   npc12112_dialogue.push( "hey" );
-   npc12112_dialogue.push( "hello" );
-   npc12112_dialogue.push( "test" );
-   npc12112_dialogue.push( "press" );
-   npc12112_dialogue.push( "enter" );
+{  // Needs enter when longer than --------------------------------
+   npc12112_dialogue.push( "I'm the town's blacksmith, but I\n"+
+                           "graduated with a degree in literature..." );
+   npc12112_dialogue.push( "I've honed my craft over the years\n"+
+                           "though!" );
+   
+   npc4114_dialogue.push( "I am a town guard, I help keep this\n"+
+                          "place safe!" );
+   
+   npc17113_dialogue.push( "Oh someone help us! There is a great\n"+
+                           "evil that wishes to destory us all!\n" );
+   npc17113_dialogue.push( "You there, please help! There is a\n"+
+                           "monster that is going to wipe out the\n"+
+                           "world!" );
+   npc17113_dialogue.push( "She may look like a regular woman,\n"+
+                           "but she is the devil incarnate! Please\n"+
+                           "help us!" );
+   npc17113_dialogue.push( "You would be hailed a hero if she were\n"+
+                           "slain by your hand!" );
+   
+   npc22117_dialogue.push( "If I jump into the pond and swam\n"+
+                           "far away, would anyone chase after\n" +
+                           "me?" );
+   
+   npc20110_dialogue.push( "I love looking in the water and seeing\n"+
+                           "my reflection looking back!" );
+   npc20110_dialogue.push( "It's kinda creepy when she smiles back\n"+
+                           "and I'm not...");
+   
+   npc27110_dialogue.push( "My wife accused me of sneaking off to\n"+
+                           "try and slay the monster!" );
+   npc27110_dialogue.push( "All I was trying to do was surprise\n"+
+                           "her with flowers..." );
+  
+   npc27123_dialogue.push( "I am unsure how I am able to walk on\n"+
+                           "water..." );
+   npc27123_dialogue.push( "This is a precarious situation. \n"+
+                           "One second me and Billy were\n" +
+                           "walking around the pond. I tried\n" );
+   npc27123_dialogue.push( "to splash him by jumping.\n"  +
+                           "Low and behold the water did not \n" );
+   npc27123_dialogue.push( "move. I ventured slightly further\n" +
+                           "and ended up here.\n" +
+                           "Where did Billy dash off to though?\n" );
+   npc27123_dialogue.push( "In my glee of waterwalking, he\n" +
+                           "vanished... I hope the monster did\n" +
+                           "not get him!" );
+   npc27123_dialogue.push( "I must go, if the others see this\n"+
+                           "I may be tried for witchcraft.\n" +
+                           "They cannot comprehend my gift. \n" );
+   
+   npc33121_dialogue.push( "hey6" );
+   
+   npc34107_dialogue.push( "Hello citizen, have no fear, Town\n" +
+                           "Guard is here! Oh, you are going\n" +
+                           "to be a hero and slay the monster?" );
+   npc34107_dialogue.push( "Right... good luck with that." );
+   
+   npc43107_dialogue.push( "I'll say nice things at the\n" +
+                           "funeral. It's too dangerous for\n"+
+                           "anyone to survive out there." );
+   
+   npc4123_dialogue.push( "Oh my, a dashing young hero to save\n" +
+                          "us all! Thank you youngster. Now I\n"+
+                          "can tend to my crops again." );
+   
+   npc40121_dialogue.push( "hey0" );   
+   
 }
 
 
