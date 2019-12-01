@@ -18,6 +18,9 @@ PIXI.loader
   .load(generateLevel);
 
 var battle_stage = new PIXI.Container();
+var attack_stage = new PIXI.Container();
+var steal_stage = new PIXI.Container();
+var item_stage = new PIXI.Container();
 var battle_text_stage = new PIXI.Container();
 var game_stage = new PIXI.Container();
 game_stage.scale.x = GAME_SCALE;
@@ -26,6 +29,10 @@ game_stage.scale.y = GAME_SCALE;
 var master_stage = new PIXI.Container();
 var battle_screen;
 var player;
+var player_name;
+var player_text;
+var battle_x;
+var battle_y;
 var temp_x;
 var temp_y;
 var temp_direction;
@@ -41,6 +48,7 @@ var hand;
 var mode;
 var menu_text;
 var magic_text;
+var enemy_text;
 var item_text;
 var step = 10;
 var count = 1;
@@ -89,8 +97,9 @@ function generateLevel()
    teleportArray = world.getObject("Teleport").data;
    npcArray = world.getObject("NPC").data;
 	
-	player = createMovieClip( PLAYERMOVEAMOUNT * 2, PLAYERMOVEAMOUNT * 106, 1, 1, "Player right", 1, 3 );
+	player = createMovieClip( PLAYERMOVEAMOUNT * 2, PLAYERMOVEAMOUNT * 106, 1, 1, "PlayerRight", 1, 3 );
 	playerDirection = RIGHT;
+	player_name = "Hero"; //Replace with user input
    //player.anchor.x = .5;
 	//player.anchor.y = .5;
 	game_stage.addChild( player );
@@ -137,38 +146,40 @@ function generateBattleMenu()
       }
 
       menu_text = new PIXI.extras.BitmapText("fight\nsteal\nitem\nrun", {font: "16px gamefont"});
-      //text2 = new PIXI.extras.BitmapText("", {font: "16px gamefont"});
-      menu_text.position.x = 100;
+      menu_text.position.x = 105;
       menu_text.position.y = 250;
-	  menu_text.scale_x = 1.5;
-	  menu_text.scale_y = 1.5;
 	  battle_text_stage.addChild( menu_text );
+	  
+	  player_text = new PIXI.extras.BitmapText(player_name, {font: "16px gamefont"});
+      player_text.position.x = 10;
+      player_text.position.y = 250;
+	  battle_text_stage.addChild( player_text );
 	  
 	  temp_x = player.position.x;
 	  temp_y = player.position.y;
 	  temp_direction = playerDirection;
 	  
-	  swapPlayer( player.x, player.y, 1, 1, "Player right"  );
-	  player.position.x = 100;
-	  player.position.y = 200;
-	  player.scale.x = 5;
-	  player.scale.y = 5;
+	  swapPlayer( 100, 200, 5, 5, "PlayerAttack", 1, 5 );
 	  
 	  battle_stage.addChild( player );
 	  
 	  current_enemy = checkTarget();
+	  enemy_text = new PIXI.extras.BitmapText(current_enemy.name, {font: "16px gamefont"});
+	  enemy_text.position.x = 250;
+	  enemy_text.position.y = 250;
+	  battle_text_stage.addChild( enemy_text );
+	  battle_stage.addChild(current_enemy.health_meter);
+	  
 	  switch ( current_enemy.id ) {
 			case BAT:
-				current_enemy.state = createMovieClip( 250, 200, 1, 1, current_enemy.name, 1, 2 );
+				current_enemy.state = createMovieClip( 250, 200, 1, 1, current_enemy.name, 1, 7 );
+				current_enemy.state.animationSpeed = 0.25;
 				break;
 			case GOBLIN:
 				current_enemy.state = createMovieClip( 250, 200, 5, 5, current_enemy.name, 1, 2 );
 				break;
 	  }
 	  
-	  //current_enemy.state.position.x = 150;
-	  //current_enemy.state.position.y = 200;
-	  //alert("Target: " + current_enemy.name);
 	  battle_stage.addChild( current_enemy.state );
 
       if ( hand != null ) 
@@ -189,11 +200,13 @@ function generateBattleMenu()
 
 function update() 
 {
-	generateHealthMeter();
-	//removeDeadEnemies();
+	removeDeadEnemies();
 	requestAnimationFrame( update );
 	update_camera();
-	if ( battle_active ) { renderer.render( battle_stage ); }
+	if ( battle_active ) { 
+		generateHealthMeter();
+		current_enemy.updateHealthBar();
+		renderer.render( battle_stage ); }
 	else { renderer.render( master_stage ); }
 }
 
@@ -204,6 +217,7 @@ function removeDeadEnemies () {
 	for(var i in enemies){
 		var foe = enemies[i];
 		if(!foe.is_alive){
+			foe.state.visible = false;
 			delete foe;
 			game_stage.removeChild( foe.state );
 			master_stage.removeChild( foe.state );
@@ -315,7 +329,7 @@ function keydownEventHandler(event) {
          {
             // Update the player sprite to upper facing player
             player.y -= PLAYERMOVEAMOUNT;
-            swapPlayer( player.x, player.y, 1, 1, "Player up"  );
+            swapPlayer( player.x, player.y, 1, 1, "PlayerUp", 1, 3  );
             playerDirection = UP;
             
             collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
@@ -351,7 +365,7 @@ function keydownEventHandler(event) {
          {
             // Update the player sprite to lower facing player
             player.y += PLAYERMOVEAMOUNT;
-            swapPlayer( player.x, player.y, 1, 1, "Player down"  );
+            swapPlayer( player.x, player.y, 1, 1, "PlayerDown", 1, 3  );
             playerDirection = DOWN;
             
             collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
@@ -388,7 +402,7 @@ function keydownEventHandler(event) {
          {
             // Update the player sprite to left facing player
             player.x -= PLAYERMOVEAMOUNT;
-            swapPlayer( player.x, player.y, 1, 1, "Player left"  );
+            swapPlayer( player.x, player.y, 1, 1, "PlayerLeft", 1, 3  );
             playerDirection = LEFT;
             
             collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
@@ -424,7 +438,7 @@ function keydownEventHandler(event) {
          {
             // Update the player sprite to right facing player
             player.x += PLAYERMOVEAMOUNT;
-            swapPlayer( player.x, player.y, 1, 1, "Player right"  );
+            swapPlayer( player.x, player.y, 1, 1, "PlayerRight", 1, 3  );
             playerDirection = RIGHT; 
             
             collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
@@ -587,70 +601,70 @@ function teleportPlayer( teleportIndex )
       case 10644:
          player.x = PLAYERMOVEAMOUNT * 4;
          player.y = PLAYERMOVEAMOUNT * 3;
-         swapPlayer( player.x, player.y, 1, 1, "Player down"  );
+         swapPlayer( player.x, player.y, 1, 1, "PlayerDown", 1, 3  );
          playerDirection = DOWN;
          break;
          
       case 204:
          player.x = PLAYERMOVEAMOUNT * 44;
          player.y = PLAYERMOVEAMOUNT * 107;
-         swapPlayer( player.x, player.y, 1, 1, "Player down"  );
+         swapPlayer( player.x, player.y, 1, 1, "PlayerDown", 1, 3  );
          playerDirection = DOWN;
          break;
       
       case 4544:
          player.x = PLAYERMOVEAMOUNT * 55;
          player.y = PLAYERMOVEAMOUNT * 44;
-         swapPlayer( player.x, player.y, 1, 1, "Player up"  );
+         swapPlayer( player.x, player.y, 1, 1, "PlayerUp", 1, 3  );
          playerDirection = UP;
          break;
       
       case 4555:
          player.x = PLAYERMOVEAMOUNT * 44;
          player.y = PLAYERMOVEAMOUNT * 44;
-         swapPlayer( player.x, player.y, 1, 1, "Player up"  );
+         swapPlayer( player.x, player.y, 1, 1, "PlayerUp", 1, 3  );
          playerDirection = UP;
          break;
       
       case 495:
          player.x = PLAYERMOVEAMOUNT * 55;
          player.y = PLAYERMOVEAMOUNT * 107;
-         swapPlayer( player.x, player.y, 1, 1, "Player down"  );
+         swapPlayer( player.x, player.y, 1, 1, "PlayerDown", 1, 3  );
          playerDirection = DOWN;
          break;
       
       case 10655:
          player.x = PLAYERMOVEAMOUNT * 95;
          player.y = PLAYERMOVEAMOUNT * 5;
-         swapPlayer( player.x, player.y, 1, 1, "Player down"  );
+         swapPlayer( player.x, player.y, 1, 1, "PlayerDown", 1, 3  );
          playerDirection = DOWN;
          break;
       
       case 10698:
          player.x = PLAYERMOVEAMOUNT * 1;
          player.y = PLAYERMOVEAMOUNT * 94;
-         swapPlayer( player.x, player.y, 1, 1, "Player up"  );
+         swapPlayer( player.x, player.y, 1, 1, "PlayerUp", 1, 3  );
          playerDirection = UP;
          break;
          
       case 9501:
          player.x = PLAYERMOVEAMOUNT * 98;
          player.y = PLAYERMOVEAMOUNT * 107;
-         swapPlayer( player.x, player.y, 1, 1, "Player down"  );
+         swapPlayer( player.x, player.y, 1, 1, "PlayerDown", 1, 3  );
          playerDirection = DOWN;
          break;
       
       case 5644:
          player.x = PLAYERMOVEAMOUNT * 55;
          player.y = PLAYERMOVEAMOUNT * 57;
-         swapPlayer( player.x, player.y, 1, 1, "Player down"  );
+         swapPlayer( player.x, player.y, 1, 1, "PlayerDown", 1, 3  );
          playerDirection = DOWN;
          break;
       
       case 5655:
          player.x = PLAYERMOVEAMOUNT * 44;
          player.y = PLAYERMOVEAMOUNT * 57;
-         swapPlayer( player.x, player.y, 1, 1, "Player down"  );
+         swapPlayer( player.x, player.y, 1, 1, "PlayerDown", 1, 3  );
          playerDirection = DOWN;
          break;
    }
@@ -691,13 +705,12 @@ function fight( foe ) { //Pass in enemy
 function playerAttack( foe ) {
 	if (player_alive) {
 		var player_attack = getRand(2) + 2;
-		alert("Your attack hit the enemy for " + player_attack + " damage.");
+		//alert("Your attack hit the enemy for " + player_attack + " damage.");
+		swapPlayer( 100, 200, 5, 5, "PlayerRight", 1, 3  );
 		foe.health -= player_attack;
 
 		if ( foe.health <= 0 ) { 
-			alert("The enemy has been slain."); 
-			game_stage.removeChild( foe.state );
-			game_stage.removeChild( foe.health_meter );
+			//alert("The enemy has been slain."); 
 			foe.is_alive = false;
 			var index = enemies.indexOf( foe );
 			if (index > -1) {
@@ -717,18 +730,19 @@ function enemyAttack( foe ) {
 		var enemy_chance = getRand(10);
 		
 		if ( enemy_chance < 8 ) {
-			alert( "The enemy hits you for " + foe.attack + " damage." );
+			//alert( "The enemy hits you for " + foe.attack + " damage." );
 			player_health -= foe.attack;
 		}
 
 		else {
-			alert("The enemy misses their attack.");
+			//alert("The enemy misses their attack.");
 		}
 
 		if ( player_health <= 0 ) {
-			alert("You have fallen in battle. ;-;");
+			//alert("You have fallen in battle. ;-;");
 			game_stage.removeChild( player ); 
 			game_stage.removeChild( health_meter );
+			player.stop();
 			player_alive = false;
 			endBattle( foe );
 		}
@@ -741,9 +755,9 @@ function enemyAttack( foe ) {
 function steal( foe ) {
 	var steal_chance = getRand(10);
 	if ( player_speed > foe.speed ) {
-		if ( steal_chance < 6 ) { alert("Couldn't steal."); } //50% chance
+		//if ( steal_chance < 6 ) { alert("Couldn't steal."); } //50% chance
 
-		else { alert("You have stolen <item> from enemy."); }
+		//else { alert("You have stolen <item> from enemy."); }
 
 		enemyAttack( foe );
 	}
@@ -751,9 +765,9 @@ function steal( foe ) {
 	else {
 		enemyAttack( foe );
 	
-		if ( steal_chance < 6 ) { alert("Couldn't steal."); } //50% chance
+		//if ( steal_chance < 6 ) { alert("Couldn't steal."); } //50% chance
 
-		else { alert("You have stolen <item> from enemy."); }	
+		//else { alert("You have stolen <item> from enemy."); }	
 	}
 }
 
@@ -761,7 +775,7 @@ function steal( foe ) {
 	Helper function that handles using an item action in combat
 */
 function useItem( foe ) {
-	alert("You drink a health potion.");
+	//alert("You drink a health potion.");
 	player_health += getRand(3) + 2; //30% - 50%
 	enemyAttack( foe );
 }
@@ -773,16 +787,12 @@ function run( foe ) {
 	var run_chance = getRand(10);
 	
 	if ( run_chance == 10 ) { //10% chance to fail
-		alert("Couldn't get away.");
+		//alert("Couldn't get away.");
 		enemyAttack( foe ); // run fail
 	}
 
 	else {
-        alert("You have escaped.");
-		for(var i in enemies){
-		var foe = enemies[i];
-		alert(foe.name);
-		}
+        //alert("You have escaped.");
 		endBattle( foe ); // run success
 	}
 }
@@ -792,7 +802,7 @@ function run( foe ) {
 */
 function generateHealthMeter () {
 	if ( health_meter != null ) {
-		game_stage.removeChild( health_meter );
+		battle_stage.removeChild( health_meter );
 		delete health_meter;
 	}
 	
@@ -801,13 +811,8 @@ function generateHealthMeter () {
 	if ( player_health > 10 ) { player_health = 10; }
 
 	if ( player_alive ) {
-		health_meter = createSprite( player.position.x, player.position.y + 25, .2, .1, ( "ex_meter" + player_health + ".png" ) );
-		game_stage.addChild( health_meter );
-	}
-
-	for(var item in enemies){
-		var foe = enemies[item];
-		foe.updateHealthBar();
+		health_meter = createSprite( player.position.x - 100, player.position.y + 200, .5, .5, ( "ex_meter" + player_health + ".png" ) );
+		battle_stage.addChild( health_meter );
 	}
 }
 
@@ -830,22 +835,22 @@ function clearBattleScreen() {
 	
 	switch ( temp_direction ) {
 			case UP:
-				swapPlayer( temp_x, temp_y, 1, 1, "Player up"  );
+				swapPlayer( temp_x, temp_y, 1, 1, "PlayerUp", 1, 3  );
 				break;
 			case DOWN:
-				swapPlayer( temp_x, temp_y, 1, 1, "Player down"  );
+				swapPlayer( temp_x, temp_y, 1, 1, "PlayerDown", 1, 3  );
 				break;
 			case LEFT:
-				swapPlayer( temp_x, temp_y, 1, 1, "Player left"  );
+				swapPlayer( temp_x, temp_y, 1, 1, "PlayerLeft", 1, 3  );
 				break;
 			case RIGHT:
-				swapPlayer( temp_x, temp_y, 1, 1, "Player right"  );
+				swapPlayer( temp_x, temp_y, 1, 1, "PlayerRight", 1, 3  );
 				break;
 	}
 	
 	battle_stage.removeChild( current_enemy.state );
 	current_enemy = null;
-	battle_stage = new PIXI.Container();
+	//battle_stage = new PIXI.Container();
 	master_stage.removeChild( battle_stage ); 
 }
 
@@ -897,9 +902,9 @@ function createMovieClip ( x, y, scale_x, scale_y, image, low, high ) {
 /**
 	Helper function that swaps the player sprite
 */
-function swapPlayer ( x, y, scale_x, scale_y, image ) {
+function swapPlayer ( x, y, scale_x, scale_y, image, low, high ) {
 	game_stage.removeChild( player );
-	player = createMovieClip( x, y, scale_x, scale_y, image, 1, 3 );
+	player = createMovieClip( x, y, scale_x, scale_y, image, low, high );
 	game_stage.addChild( player );
 }
 
@@ -938,9 +943,8 @@ function Enemy(obj) {
         this.state = createMovieClip( this.x, this.y, 1, 1, "Overworld_Bat", 1, 2 );
         this.name = "Bat";
 		this.health = 10;
-		this.health_meter = createSprite( this.x, this.y + 25, .2, .1, ( "ex_meter10.png" ) );
-		game_stage.addChild( this.health_meter );
-        this.attack = 3;
+		this.health_meter = createSprite( 350, 400, .5, .5, ( "ex_meter10.png" ) );
+		this.attack = 3;
 		this.speed = 2;
 		this.is_alive = true;
 		this.is_hit = false;
@@ -953,9 +957,9 @@ function Enemy(obj) {
         this.state = obj.state;
         this.name = obj.name;
 		this.health = 10;
-		this.health_meter = createSprite( this.x, this.y + 25, .2, .1, ( "ex_meter10.png" ) );
-		game_stage.addChild( this.health_meter );
-        this.attack = obj.attack;
+		this.health_meter = createSprite( 350, 400, .5, .5, ( "ex_meter10.png" ) );
+		
+		this.attack = obj.attack;
 		this.speed = obj.speed;
 		this.is_alive = true;
 		this.is_hit = false;
@@ -969,7 +973,7 @@ function Enemy(obj) {
 Enemy.prototype.updateHealthBar = function () {
     'use strict';
     if ( this.health_meter != null ) {
-		game_stage.removeChild( this.health_meter );
+		battle_stage.removeChild( this.health_meter );
 	}
 
 	if ( this.health < 0 ) { this.health = 0; }
@@ -977,7 +981,7 @@ Enemy.prototype.updateHealthBar = function () {
 	if ( this.health > 10 ) { this.health = 10; }
 	
 	if ( this.is_alive ) {
-		this.health_meter = createSprite( this.x, this.y + 25, .2, .1, ( "ex_meter" + this.health + ".png" ) );
-		game_stage.addChild( this.health_meter );
+		this.health_meter = createSprite( 350, 400, .5, .5, ( "ex_meter" + this.health + ".png" ) );
+		battle_stage.addChild( this.health_meter );
 	}
 };
