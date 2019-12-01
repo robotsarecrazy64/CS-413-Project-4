@@ -39,11 +39,11 @@ var temp_x;
 var temp_y;
 var temp_direction;
 var player_health = 10;
-var player_attack = 3;
+var player_attack = 99;
 var health_meter;
 var player_alive = true;
 var player_boost = false;
-var player_armor = 1;
+var player_armor = 10;
 var player_speed = 5;
 var enemy;
 var danger_level;
@@ -230,6 +230,7 @@ function generateBattleMenu()
 	  battle_stage.addChild( player );
 	  
 	  current_enemy = checkTarget();
+	  current_enemy.visible = true;
 	  enemy_text = new PIXI.extras.BitmapText(current_enemy.name, {font: "16px gamefont"});
 	  enemy_text.position.x = 250;
 	  enemy_text.position.y = 250;
@@ -285,14 +286,16 @@ function generateBattleMenu()
 
 function update() 
 {
-	removeDeadEnemies();
+	
 	requestAnimationFrame( update );
 	update_camera();
 	if ( battle_active ) { 
 		generateHealthMeter();
 		current_enemy.updateHealthBar();
 		renderer.render( battle_stage ); }
-	else { renderer.render( master_stage ); }
+	else { 
+	removeDeadEnemies();
+	renderer.render( master_stage ); }
 }
 
 /**
@@ -301,11 +304,11 @@ function update()
 function removeDeadEnemies () {
 	for(var i in enemies){
 		var foe = enemies[i];
-		if(!foe.is_alive){
+		if(foe === current_enemy){
 			foe.state.visible = false;
 			delete foe;
 			game_stage.removeChild( foe.state );
-			master_stage.removeChild( foe.state );
+			//master_stage.removeChild( foe.state );
 			
 		}
 	}
@@ -361,6 +364,8 @@ function checkEnemyPlayerCollisions(){
 		var foe = enemies[i];
 		if(checkRectangleCollision(player, foe.state)){
 			foe.is_hit = true;
+			foe.state.visible = false;
+			game_stage.removeChild(foe);
 			return true;
 		}
 	}
@@ -959,11 +964,13 @@ function enemyAttack( foe ) {
 
 		if ( player_health <= 0 ) {
 			//alert("You have fallen in battle. ;-;");
-			game_stage.removeChild( player ); 
-			game_stage.removeChild( health_meter );
-			player.stop();
-			player_alive = false;
-			endBattle( foe );
+			if ( player_armor <= 1 ) {
+				game_stage.removeChild( player ); 
+				game_stage.removeChild( health_meter );
+				player.stop();
+				player_alive = false;
+				endBattle( foe );
+			}
 		}
 	}
 }
@@ -1028,6 +1035,10 @@ function generateHealthMeter () {
 	if ( health_meter != null ) {
 		battle_stage.removeChild( health_meter );
 		delete health_meter;
+	}
+	
+	if ( player_armor > 0 ) {
+		if ( player_health <= 0 ) { player_health += 10; }
 	}
 	
 	player_threat_stage.removeChildren();
