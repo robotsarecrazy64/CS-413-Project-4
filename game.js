@@ -23,6 +23,7 @@ var steal_stage = new PIXI.Container();
 var item_stage = new PIXI.Container();
 var battle_text_stage = new PIXI.Container();
 var threat_stage = new PIXI.Container();
+var player_threat_stage = new PIXI.Container();
 var game_stage = new PIXI.Container();
 game_stage.scale.x = GAME_SCALE;
 game_stage.scale.y = GAME_SCALE;
@@ -40,7 +41,7 @@ var temp_direction;
 var player_health = 10;
 var health_meter;
 var player_alive = true;
-var player_charge;
+var player_armor = 1;
 var player_speed = 5;
 var enemy;
 var danger_level;
@@ -191,6 +192,7 @@ function generateBattleMenu()
 	  
 	  battle_stage.addChild( current_enemy.state );
 	  battle_stage.addChild( threat_stage );
+	  battle_stage.addChild( player_threat_stage );
 
       if ( hand != null ) 
       {
@@ -833,6 +835,14 @@ function generateHealthMeter () {
 	if ( health_meter != null ) {
 		battle_stage.removeChild( health_meter );
 		delete health_meter;
+	}
+	
+	player_threat_stage.removeChildren();
+	
+	for ( var i = player_armor; i > 0; i-- ) {
+				danger_level = createSprite( (i*25) - 25, player.position.y + 210, 1.5, 1.5, "armor.png");
+				
+				player_threat_stage.addChild( danger_level );
 	}
 	
 	if ( player_health < 0 ) { player_health = 0; }
