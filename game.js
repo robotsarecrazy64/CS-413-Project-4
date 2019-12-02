@@ -140,13 +140,14 @@ function generateLevel()
     npcArray = world.getObject("NPC").data;
 	player = new Player();
 	game_stage.addChild( player.state );
+
 	//player = createMovieClip( PLAYER_START_X, PLAYER_START_Y, 1, 1, "PlayerRight", 1, 3 );
 	//playerDirection = RIGHT;
 	//player_name = "Hero"; //Replace with user input
    //player.anchor.x = .5;
 	//player.anchor.y = .5;
 	game_stage.addChild( player.state );
-	
+
 	enemy = new Enemy({id: OGRE,
 						num_charges: 3,
 						x: 500, 
@@ -603,8 +604,8 @@ function generateBattleMenu()
 				current_enemy.state = createMovieClip( 205, 75, 1, 1, current_enemy.name, 1, 3 );
 				break;
 			case SHADOW_KING:
-				enemy_text.position.x -= 10;
-				current_enemy.state = createMovieClip( 250, 200, 1, 1, current_enemy.name, 1, 5 );
+				enemy_text.position.x -= 50;
+				current_enemy.state = createMovieClip( 225, 10, 2, 2, current_enemy.name, 1, 5 );
 				break;
 			case SEXY_HENCHMAN:
 				enemy_text.position.x -= 75;
@@ -1011,7 +1012,6 @@ function getCurrentLine()
          {
             currentArray = npc12112_dialogue;
             player.attack++;
-			//player_attack++;
             npc12112_talked_to = true;
          }
          
@@ -1043,8 +1043,6 @@ function getCurrentLine()
          currentArray = npc33121_dialogue;
          player.armor = player.max_armor;
          player.health = 10;
-         //player_armor = player_max_armor;
-         //player_health = 10;
          break;
       case 34107:
          currentArray = npc34107_dialogue;
@@ -1542,6 +1540,7 @@ function playerAttack( foe ) {
 			//alert("The enemy has been slain.");
 			if (foe.num_charges <= 1) {
 				foe.is_alive = false;
+				player.attack++;
 				var index = enemies.indexOf( foe );
 				if (index > -1) {
 					enemies.splice(index, 1);
@@ -1665,7 +1664,7 @@ function endBattle ( foe ) {
    {
       player.attack += 1;
    }
-   
+
 	moveHand(hand.position.x, menu_text.position.y + 
                            menu_text.height - 10);
 	mode = RUN;
@@ -1805,7 +1804,6 @@ function Enemy(obj) {
         this.name = obj.name;
 		this.health = 10;
 		this.health_meter = createSprite( 350, 400, .5, .5, ( "ex_meter10.png" ) );
-		
 		this.attack = obj.attack;
 		this.speed = obj.speed;
 		this.is_alive = true;
@@ -1820,7 +1818,24 @@ function Enemy(obj) {
 Enemy.prototype.updateHealthBar = function () {
     'use strict';
 	if ( this.num_charges > 0 ) {
-		if ( this.health <= 0 ) { this.health += 10; }
+		if ( this.health < 0 ) {
+			while ( this.health < -10 ) {
+				this.num_charges--;
+				this.health += 10;
+			}
+			this.health += 10; 
+		}
+	}
+	
+	if ( this.num_charges <= 0 || this.health == 0 ) {
+		this.is_alive = false;
+		player.attack++;
+		var index = enemies.indexOf( this );
+		if (index > -1) {
+			enemies.splice(index, 1);
+		}
+		
+		endBattle(this);
 	}
 	
 	threat_stage.removeChildren();
@@ -1881,7 +1896,7 @@ function Player(obj) {
 		this.text.position.x = 10;
 		this.text.position.y = 250;
 		this.health = 10;
-		this.attack = 1;
+		this.attack = 99;
 		this.health_meter;
 		this.is_alive = true;
 		this.is_boosted = false;
