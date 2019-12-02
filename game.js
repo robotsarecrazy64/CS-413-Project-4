@@ -141,10 +141,10 @@ function generateLevel()
 	game_stage.addChild( player.state );
 	//player = createMovieClip( PLAYER_START_X, PLAYER_START_Y, 1, 1, "PlayerRight", 1, 3 );
 	//playerDirection = RIGHT;
-	player_name = "Hero"; //Replace with user input
+	//player_name = "Hero"; //Replace with user input
    //player.anchor.x = .5;
 	//player.anchor.y = .5;
-	game_stage.addChild( player );
+	game_stage.addChild( player.state );
 	
 	enemy = new Enemy({id: OGRE,
 						num_charges: 3,
@@ -1398,8 +1398,8 @@ function enemyAttack( foe ) {
 			if ( player.armor <= 1 ) {
 				game_stage.removeChild( player.state );
 				
-				player.stop();
-				player_alive = false;
+				player.state.stop();
+				player.is_alive = false;
 				endBattle( foe );
 			}
 			
@@ -1707,7 +1707,7 @@ function Player(obj) {
 		this.is_alive = true;
 		this.is_boosted = false;
 		this.armor = obj.armor;
-		this.max_armor = this.player_armor;
+		this.max_armor = this.armor;
 		this.speed = obj.speed;
 		this.direction = RIGHT;
     }
