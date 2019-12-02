@@ -25,6 +25,13 @@ var battle_text_stage = new PIXI.Container();
 var threat_stage = new PIXI.Container();
 var player_threat_stage = new PIXI.Container();
 var game_stage = new PIXI.Container();
+var startScreen = new PIXI.Container();
+var instructScreen = new PIXI.Container();
+var creditScreen = new PIXI.Container();
+var winScreen = new PIXI.Container();
+var loseScreen = new PIXI.Container();
+var back = new PIXI.Container();
+var statsScreen = new PIXI.Container();
 game_stage.scale.x = GAME_SCALE;
 game_stage.scale.y = GAME_SCALE;
 
@@ -43,7 +50,8 @@ var player_attack = 99;
 var health_meter;
 var player_alive = true;
 var player_boost = false;
-var player_armor = 10;
+var player_armor = 1;
+var player_max_armor = 1;
 var player_speed = 5;
 var enemy;
 var danger_level;
@@ -75,23 +83,26 @@ var npc34107_dialogue = [];
 var npc43107_dialogue = [];
 var npc4123_dialogue = [];
 var npc40121_dialogue = [];
+var npc40121X_dialogue = [];
+var npc12112X_dialogue = [];
+var npc40121_talked_to = false;
+var npc12112_talked_to = false;
 var currentDialogue = 0;
 var currentLine;
 var currentNPC = 0;
 var dialogueEnd = true;
 var dialogueBox;
 var dialogueText;
-<<<<<<< Updated upstream
-=======
 var playerAttackText;
 var playerHealthText;
 var playerArmorText;
 var playerArmorArray = [];
 var currentHealthSprite;
 var currentArmorSprite;
->>>>>>> Stashed changes
 
 const PLAYERMOVEAMOUNT = 25;
+const PLAYER_START_X = PLAYERMOVEAMOUNT * 2;
+const PLAYER_START_Y = PLAYERMOVEAMOUNT * 106;
 const FIGHT = 100;
 const STEAL = 200;
 const ITEM = 300;
@@ -129,7 +140,7 @@ function generateLevel()
     teleportArray = world.getObject("Teleport").data;
     npcArray = world.getObject("NPC").data;
 	
-	player = createMovieClip( PLAYERMOVEAMOUNT * 2, PLAYERMOVEAMOUNT * 106, 1, 1, "PlayerRight", 1, 3 );
+	player = createMovieClip( PLAYER_START_X, PLAYER_START_Y, 1, 1, "PlayerRight", 1, 3 );
 	playerDirection = RIGHT;
 	player_name = "Hero"; //Replace with user input
    //player.anchor.x = .5;
@@ -140,57 +151,59 @@ function generateLevel()
 	/*
 	enemy2 = new Enemy({id: GOBLIN,
 						num_charges: 1,
-						x: 700, 
-						y: 600, 
-						state: createMovieClip( 700, 600, 1, 1, "Goblin", 1, 2 ), 
+						x: PLAYERMOVEAMOUNT * , 
+						y: PLAYERMOVEAMOUNT * ,
+						state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
+                                          1, 1, "Goblin", 1, 2 ),  
 						name: "Goblin", 
 						attack: 1, 
 						speed: 6});*/
 	/*enemy2 = new Enemy({id: OGRE,
 						num_charges: 3,
-						x: 700, 
-						y: 600, 
-						state: createMovieClip( 700, 600, 1, 1, "Overworld_Ogre", 1, 3 ), 
+						x: PLAYERMOVEAMOUNT * , 
+						y: PLAYERMOVEAMOUNT * , 
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
+                                          1, 1, "Overworld_Ogre", 1, 3 ), 
 						name: "Ogre", 
 						attack: 3, 
 						speed: 2});*/
 	/*enemy2 = new Enemy({id: PIXIE,
 						num_charges: 2,
-						x: 700, 
-						y: 600, 
-						state: createMovieClip( 700, 600, 1, 1, "Overworld_Pixie", 1, 3 ), 
+						x: PLAYERMOVEAMOUNT * , 
+						y: PLAYERMOVEAMOUNT * ,
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
+                                          1, 1, "Overworld_Pixie", 1, 3 ), 
 						name: "Pixie", 
 						attack: 2, 
 						speed: 8});*/
 	/*enemy2 = new Enemy({id: POSSESSED_SOLDIER,
 						num_charges: 4,
-						x: 700, 
-						y: 600, 
-						state: createMovieClip( 700, 600, .6, .6, "Overworld_Possessed_Soldier", 1, 3 ), 
+						x: PLAYERMOVEAMOUNT * , 
+						y: PLAYERMOVEAMOUNT * , 
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
+                                          .6, .6, "Overworld_Possessed_Soldier", 1, 3 ), 
 						name: "Soldier", 
 						attack: 2, 
 						speed: 7});*/
 	/*enemy2 = new Enemy({id: SKELETON,
 						num_charges: 6,
-						x: 700, 
-						y: 600, 
-						state: createMovieClip( 700, 600, .8, .8, "Overworld_Skeleton", 1, 3 ), 
+						x: PLAYERMOVEAMOUNT * , 
+						y: PLAYERMOVEAMOUNT * ,
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
+                                          .8, .8, "Overworld_Skeleton", 1, 3 ),
 						name: "Skeleton", 
 						attack: 4, 
 						speed: 5});*/
+                  
 	enemy2 = new Enemy({id: EVIL_TREE,
 						num_charges: 5,
-						x: 700, 
-						y: 600, 
-						state: createMovieClip( 700, 500, 1, 1, "Overworld_Evil Tree", 1, 3 ), 
+						x: PLAYERMOVEAMOUNT * 36, 
+						y: PLAYERMOVEAMOUNT * 11, 
+						state: createMovieClip( PLAYERMOVEAMOUNT * 43, PLAYERMOVEAMOUNT * 43, 
+                                          1, 1, "Overworld_Evil Tree", 1, 3 ), 
 						name: "Evil Tree", 
 						attack: 4, 
 						speed: 8});
-<<<<<<< Updated upstream
-		
-	enemies.push( enemy );
-	enemies.push( enemy2 );
-=======
                   
    enemy3 = new Enemy({id: GOBLIN,
 						num_charges: 1,
@@ -294,14 +307,11 @@ function generateLevel()
 	enemies.push( enemy9 );
    enemies.push( enemy10 );
    enemies.push( enemy11 );
->>>>>>> Stashed changes
    
-    initialize_npc_dialogue();
+   initialize_npc_dialogue();
 	
 	game_stage.addChild( enemy.state );
 	game_stage.addChild( enemy2.state );
-<<<<<<< Updated upstream
-=======
    game_stage.addChild( enemy3.state );
 	game_stage.addChild( enemy4.state );
    game_stage.addChild( enemy5.state );
@@ -312,10 +322,12 @@ function generateLevel()
    game_stage.addChild( enemy10.state );
    game_stage.addChild( enemy11.state );
    
->>>>>>> Stashed changes
 	document.addEventListener('keydown', keydownEventHandler);
 	
 	master_stage.addChild(game_stage);
+   buildScreens();
+   
+   game_stage.visible = false;
 	
 	update();
 }
@@ -414,7 +426,6 @@ function generateBattleMenu()
 
 function update() 
 {
-	
 	requestAnimationFrame( update );
 	update_camera();
 	if ( battle_active ) { 
@@ -539,8 +550,16 @@ var menu = StateMachine.create({
 
 // ---------- Input handlers
 function keydownEventHandler(event) {
-   if ( player_alive ) {
-      if ( !battle_active && !dialogue_active ) {
+   if( !game_stage.visible )
+   {
+      player.x = PLAYER_START_X;
+      player.y = PLAYER_START_Y;
+   }
+   
+   else if ( player_alive ) 
+   {
+      if ( !battle_active && !dialogue_active ) 
+      {
       
          // Vertical --------------------------------------------------
          if ( event.keyCode == WKEY )
@@ -791,7 +810,18 @@ function getCurrentLine()
    switch( currentNPC )
    {
       case 12112:
-         currentArray = npc12112_dialogue;
+         if( !npc12112_talked_to )
+         {
+            currentArray = npc12112_dialogue;
+            player_attack++;
+            npc12112_talked_to = true;
+         }
+         
+         else
+         {
+            currentArray = npc12112X_dialogue;
+         }
+         
          break;
       case 4114:
          currentArray = npc4114_dialogue;
@@ -813,6 +843,8 @@ function getCurrentLine()
          break;
       case 33121:
          currentArray = npc33121_dialogue;
+         player_armor = player_max_armor;
+         player_health = 10;
          break;
       case 34107:
          currentArray = npc34107_dialogue;
@@ -824,7 +856,19 @@ function getCurrentLine()
          currentArray = npc4123_dialogue;
          break;
       case 40121:
-         currentArray = npc40121_dialogue;
+         if( !npc40121_talked_to )
+         {
+            currentArray = npc40121_dialogue;
+            player_armor++;
+            player_max_armor++;
+            npc40121_talked_to = true;
+         }
+         
+         else
+         {
+            currentArray = npc40121X_dialogue;
+         }
+         
          break;  
    }
 }
@@ -854,11 +898,26 @@ function initialize_npc_dialogue()
    npc12112_dialogue.push( "I'm the town's blacksmith, but I\n"+
                            "graduated with a degree in literature..." );
    npc12112_dialogue.push( "I've honed my craft over the years\n"+
-                           "though!" );
+                           "though! Here, let me teach you a thing\n" +
+                           "or two...");
+   npc12112_dialogue.push( "Your attack increased!" );
+   npc12112_dialogue.push( "Also, 1 armor equal 10 health! So if\n"+
+                           "you have 2 armor, you have 20 total\n" +
+                           "health. But beware! You cannot restore");
+   npc12112_dialogue.push( "armor in combat, only health. Find\n"+
+                           "someone in a town who can restore it\n" +
+                           "for you.");
    
+   // Needs enter when longer than --------------------------------
+   npc12112X_dialogue.push( "Sheesh, trying to take advantage of\n" +
+                            "my generosity even more? Greedy lil\n"+
+                            "bugger...");
+   
+   // Needs enter when longer than --------------------------------
    npc4114_dialogue.push( "I am a town guard, I help keep this\n"+
                           "place safe!" );
    
+   // Needs enter when longer than --------------------------------
    npc17113_dialogue.push( "Oh someone help us! There is a great\n"+
                            "evil that wishes to destory us all!\n" );
    npc17113_dialogue.push( "You there, please help! There is a\n"+
@@ -870,53 +929,81 @@ function initialize_npc_dialogue()
    npc17113_dialogue.push( "You would be hailed a hero if she were\n"+
                            "slain by your hand!" );
    
+   // Needs enter when longer than --------------------------------
    npc22117_dialogue.push( "If I jump into the pond and swam\n"+
                            "far away, would anyone chase after\n" +
                            "me?" );
    
+   // Needs enter when longer than --------------------------------
    npc20110_dialogue.push( "I love looking in the water and seeing\n"+
                            "my reflection looking back!" );
    npc20110_dialogue.push( "It's kinda creepy when she smiles back\n"+
                            "and I'm not...");
    
+   // Needs enter when longer than --------------------------------
    npc27110_dialogue.push( "My wife accused me of sneaking off to\n"+
                            "try and slay the monster!" );
    npc27110_dialogue.push( "All I was trying to do was surprise\n"+
                            "her with flowers..." );
-  
+   
+   // Needs enter when longer than --------------------------------
    npc27123_dialogue.push( "I am unsure how I am able to walk on\n"+
                            "water..." );
    npc27123_dialogue.push( "This is a precarious situation. \n"+
                            "One second me and Billy were\n" +
                            "walking around the pond. I tried\n" );
    npc27123_dialogue.push( "to splash him by jumping.\n"  +
-                           "Low and behold the water did not \n" );
-   npc27123_dialogue.push( "move. I ventured slightly further\n" +
-                           "and ended up here.\n" +
-                           "Where did Billy dash off to though?\n" );
-   npc27123_dialogue.push( "In my glee of waterwalking, he\n" +
-                           "vanished... I hope the monster did\n" +
-                           "not get him!" );
-   npc27123_dialogue.push( "I must go, if the others see this\n"+
-                           "I may be tried for witchcraft.\n" +
+                           "Low and behold the water did not \n" +
+                           "move. I ventured slightly further\n" );
+   npc27123_dialogue.push( "and ended up here.\n" +
+                           "Where did Billy dash off to though?\n" +
+                           "In my glee of waterwalking, he\n" );
+   npc27123_dialogue.push( "vanished... I hope a monster did\n" +
+                           "not get him!\n" +
+                           "I must go, if the others see this\n");
+   npc27123_dialogue.push( "I may be tried for witchcraft.\n" +
                            "They cannot comprehend my gift. \n" );
    
-   npc33121_dialogue.push( "hey6" );
+   // Needs enter when longer than --------------------------------
+   npc33121_dialogue.push( "You look injured! Let me patch you\n" +
+                           "up!");
+   npc33121_dialogue.push( "Your health and armor has been \n"+
+                           "restored!" );
    
+   // Needs enter when longer than --------------------------------
    npc34107_dialogue.push( "Hello citizen, have no fear, Town\n" +
                            "Guard is here! Oh, you are going\n" +
                            "to be a hero and slay the monster?" );
    npc34107_dialogue.push( "Right... good luck with that." );
    
-   npc43107_dialogue.push( "I'll say nice things at the\n" +
-                           "funeral. It's too dangerous for\n"+
-                           "anyone to survive out there." );
+   // Needs enter when longer than --------------------------------
+   npc43107_dialogue.push( "Hey I recognize that sword! It's the \n" +
+                           "hero sword right? The one that gets\n"+
+                           "stronger the more monsters you kill?" );
+   npc43107_dialogue.push( "You best be careful out there, the King\n" +
+                           "is absorbing monsters to power up...\n"+
+                           "If you flee from a monster, it will get" );
+   npc43107_dialogue.push( "absorbed by the Shadow King to \n" +
+                           "power his world ending attack! Better \n"+
+                           "kill them while you have the chance." );
+   npc43107_dialogue.push( "I'll say nice things at your funeral.\n" +
+                           "It's too dangerous for anyone to \n"+
+                           "survive out there." );
    
+   // Needs enter when longer than --------------------------------
    npc4123_dialogue.push( "Oh my, a dashing young hero to save\n" +
                           "us all! Thank you youngster. Now I\n"+
                           "can tend to my crops again." );
    
-   npc40121_dialogue.push( "hey0" );   
+   // Needs enter when longer than --------------------------------
+   npc40121_dialogue.push( "I wish I could still adventure like\n"+
+                           "you! You inspire me, please take my\n" +
+                           "knowledge of defense!" );
+   npc40121_dialogue.push( "Your armor has increased!" );
+   
+   // Needs enter when longer than --------------------------------
+   npc40121X_dialogue.push( "You've already taken my knowledge...\n" + 
+                            "What more do you want of me!?" ); 
    
 }
 
@@ -1000,8 +1087,6 @@ function teleportPlayer( teleportIndex )
 }
 
 
-<<<<<<< Updated upstream
-=======
 /**
 	Builds the different screens of the game
 */
@@ -1213,7 +1298,6 @@ function createShape() {
 }
 
 
->>>>>>> Stashed changes
 function checkTarget(){
 
 	for(var i in enemies){
@@ -1313,6 +1397,7 @@ function enemyAttack( foe ) {
 				player_alive = false;
 				endBattle( foe );
 			}
+         player_armor--;
 		}
 	}
 }
