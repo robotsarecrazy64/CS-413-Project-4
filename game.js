@@ -93,11 +93,6 @@ var currentNPC = 0;
 var dialogueEnd = true;
 var dialogueBox;
 var dialogueText;
-var playerAttackText;
-var playerHealthText;
-var playerArmorText;
-var playerArmorArray = [];
-var currentHealthSprite;
 
 const PLAYERMOVEAMOUNT = 25;
 const PLAYER_START_X = PLAYERMOVEAMOUNT * 2;
@@ -150,163 +145,61 @@ function generateLevel()
 	/*
 	enemy2 = new Enemy({id: GOBLIN,
 						num_charges: 1,
-						x: PLAYERMOVEAMOUNT * , 
-						y: PLAYERMOVEAMOUNT * ,
-						state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
-                                          1, 1, "Goblin", 1, 2 ),  
+						x: 700, 
+						y: 600, 
+						state: createMovieClip( 700, 600, 1, 1, "Goblin", 1, 2 ), 
 						name: "Goblin", 
 						attack: 1, 
 						speed: 6});*/
 	/*enemy2 = new Enemy({id: OGRE,
 						num_charges: 3,
-						x: PLAYERMOVEAMOUNT * , 
-						y: PLAYERMOVEAMOUNT * , 
-                  state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
-                                          1, 1, "Overworld_Ogre", 1, 3 ), 
+						x: 700, 
+						y: 600, 
+						state: createMovieClip( 700, 600, 1, 1, "Overworld_Ogre", 1, 3 ), 
 						name: "Ogre", 
 						attack: 3, 
 						speed: 2});*/
 	/*enemy2 = new Enemy({id: PIXIE,
 						num_charges: 2,
-						x: PLAYERMOVEAMOUNT * , 
-						y: PLAYERMOVEAMOUNT * ,
-                  state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
-                                          1, 1, "Overworld_Pixie", 1, 3 ), 
+						x: 700, 
+						y: 600, 
+						state: createMovieClip( 700, 600, 1, 1, "Overworld_Pixie", 1, 3 ), 
 						name: "Pixie", 
 						attack: 2, 
 						speed: 8});*/
 	/*enemy2 = new Enemy({id: POSSESSED_SOLDIER,
 						num_charges: 4,
-						x: PLAYERMOVEAMOUNT * , 
-						y: PLAYERMOVEAMOUNT * , 
-                  state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
-                                          .6, .6, "Overworld_Possessed_Soldier", 1, 3 ), 
+						x: 700, 
+						y: 600, 
+						state: createMovieClip( 700, 600, .6, .6, "Overworld_Possessed_Soldier", 1, 3 ), 
 						name: "Soldier", 
 						attack: 2, 
 						speed: 7});*/
 	/*enemy2 = new Enemy({id: SKELETON,
 						num_charges: 6,
-						x: PLAYERMOVEAMOUNT * , 
-						y: PLAYERMOVEAMOUNT * ,
-                  state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
-                                          .8, .8, "Overworld_Skeleton", 1, 3 ),
+						x: 700, 
+						y: 600, 
+						state: createMovieClip( 700, 600, .8, .8, "Overworld_Skeleton", 1, 3 ), 
 						name: "Skeleton", 
 						attack: 4, 
 						speed: 5});*/
-                  
 	enemy2 = new Enemy({id: EVIL_TREE,
 						num_charges: 5,
-						x: PLAYERMOVEAMOUNT * 36, 
-						y: PLAYERMOVEAMOUNT * 11, 
+						x: PLAYERMOVEAMOUNT * 43, 
+						y: PLAYERMOVEAMOUNT * 43, 
 						state: createMovieClip( PLAYERMOVEAMOUNT * 43, PLAYERMOVEAMOUNT * 43, 
                                           1, 1, "Overworld_Evil Tree", 1, 3 ), 
 						name: "Evil Tree", 
 						attack: 4, 
 						speed: 8});
-                  
-   enemy3 = new Enemy({id: GOBLIN,
-						num_charges: 1,
-						x: PLAYERMOVEAMOUNT * 18, 
-						y: PLAYERMOVEAMOUNT * 4,
-						state: createMovieClip( PLAYERMOVEAMOUNT * 18, PLAYERMOVEAMOUNT * 4,
-                                          1, 1, "Goblin", 1, 2 ), 
-						name: "Goblin", 
-						attack: 1, 
-						speed: 6});
-                  
-   enemy4 = new Enemy({id: GOBLIN,
-						num_charges: 1,
-						x: PLAYERMOVEAMOUNT * 16, 
-						y: PLAYERMOVEAMOUNT * 40,
-						state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
-                                          1, 1, "Goblin", 1, 2 ), 
-						name: "Goblin", 
-						attack: 1, 
-						speed: 6});
-   
-   enemy5 = new Enemy({id: GOBLIN,
-						num_charges: 1,
-						x: PLAYERMOVEAMOUNT * 8, 
-						y: PLAYERMOVEAMOUNT * 27,
-						state: createMovieClip( PLAYERMOVEAMOUNT * 8, PLAYERMOVEAMOUNT * 27,
-                                          1, 1, "Goblin", 1, 2 ),  
-						name: "Goblin", 
-						attack: 1, 
-						speed: 6});
-   
-   enemy6 = new Enemy({id: GOBLIN,
-						num_charges: 1,
-						x: PLAYERMOVEAMOUNT * 16, 
-						y: PLAYERMOVEAMOUNT * 20,
-						state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 20,
-                                          1, 1, "Goblin", 1, 2 ), 
-						name: "Goblin", 
-						attack: 1, 
-						speed: 6});
-                  
-   enemy7 = new Enemy({id: PIXIE,
-						num_charges: 2,
-						x: PLAYERMOVEAMOUNT * 28, 
-						y: PLAYERMOVEAMOUNT * 39,
-                  state: createMovieClip( PLAYERMOVEAMOUNT * 28, PLAYERMOVEAMOUNT * 39,
-                                          1, 1, "Overworld_Pixie", 1, 3 ), 
-						name: "Pixie", 
-						attack: 2, 
-						speed: 8});
-   
-   enemy8 = new Enemy({id: PIXIE,
-						num_charges: 2,
-						x: PLAYERMOVEAMOUNT * 43, 
-						y: PLAYERMOVEAMOUNT * 29,
-                  state: createMovieClip( PLAYERMOVEAMOUNT * 43, PLAYERMOVEAMOUNT * 29,
-                                          1, 1, "Overworld_Pixie", 1, 3 ), 
-						name: "Pixie", 
-						attack: 2, 
-						speed: 8});
-   
-   enemy9 = new Enemy({id: PIXIE,
-						num_charges: 2,
-						x: PLAYERMOVEAMOUNT * 39, 
-						y: PLAYERMOVEAMOUNT * 4,
-                  state: createMovieClip( PLAYERMOVEAMOUNT * 39, PLAYERMOVEAMOUNT * 4,
-                                          1, 1, "Overworld_Pixie", 1, 3 ), 
-						name: "Pixie", 
-						attack: 2, 
-						speed: 8});
-   
-   enemy9 = new Enemy({id: PIXIE,
-						num_charges: 2,
-						x: PLAYERMOVEAMOUNT * 30, 
-						y: PLAYERMOVEAMOUNT * 23,
-                  state: createMovieClip( PLAYERMOVEAMOUNT * 30, PLAYERMOVEAMOUNT * 23,
-                                          1, 1, "Overworld_Pixie", 1, 3 ), 
-						name: "Pixie", 
-						attack: 2, 
-						speed: 8});
-   
 		
 	enemies.push( enemy );
 	enemies.push( enemy2 );
-   enemies.push( enemy3 );
-	enemies.push( enemy4 );
-   enemies.push( enemy5 );
-	enemies.push( enemy6 );
-   enemies.push( enemy7 );
-   enemies.push( enemy8 );
-	enemies.push( enemy9 );
    
    initialize_npc_dialogue();
 	
 	game_stage.addChild( enemy.state );
 	game_stage.addChild( enemy2.state );
-   game_stage.addChild( enemy3.state );
-	game_stage.addChild( enemy4.state );
-   game_stage.addChild( enemy5.state );
-	game_stage.addChild( enemy6.state );
-   game_stage.addChild( enemy7.state );
-   game_stage.addChild( enemy8.state );
-	game_stage.addChild( enemy9.state );
-   
 	document.addEventListener('keydown', keydownEventHandler);
 	
 	master_stage.addChild(game_stage);
@@ -1085,7 +978,7 @@ function buildScreens() {
 
     // Text for titles
    var gameStatsText = new PIXI.Text( "Stats", {fill : 0x000000} );
-   var playerAttackText = new PIXI.Text( "Attack:" , {fill : 0xFFFFFF} );
+   var playerAttackText = new PIXI.Text( "Attack:", {fill : 0xFFFFFF} );
    var playerHealthText = new PIXI.Text( "Health:", {fill : 0xFFFFFF} );
    var playerArmorText = new PIXI.Text( "Armor:", {fill : 0xFFFFFF} );
    var gameTitleText = new PIXI.Text( "RPG!", {fill : 0xFFFFFF} );
@@ -1134,30 +1027,9 @@ function buildScreens() {
    
    // Declares interactable text functions
    gameStatsText.click = function(event) { statsScreen.visible = true;
-                                           playerAttackText.setText( "Attack: " + player_attack );
-                                           currentHealthSprite = createSprite( 103, 437, 1, 1, "ex_meter" + 
-                                                                  player_health + ".png" );
-                                           statsScreen.addChild( currentHealthSprite );
-                                           
-                                           for( var i = 0; i < player_armor; i++)
-                                           {
-                                              playerArmorArray[i] = createSprite( 100 + i * 25, 467, 1, 1, "armor.png" );
-                                           }
-                                           
-                                           for( armor of playerArmorArray )
-                                           {
-                                              statsScreen.addChild( armor );
-                                           }
-                                           
-                                           }
+                                           updateStats(); }
    
-   gameStatsBackText.click = function(event) { statsScreen.visible = false; 
-                                               statsScreen.removeChild( currentHealthSprite );
-                                               for( var armor of playerArmorArray )
-                                               {
-                                                  statsScreen.removeChild( playerArmorArray[armor] );
-                                               }  
-                                           }
+   gameStatsBackText.click = function(event) { statsScreen.visible = false; }
                                            
    gameStartText.click = function(event) { startScreen.visible = false; 
                                            game_stage.visible = true;
@@ -1289,6 +1161,14 @@ function createShape() {
    graphics.drawRect(0, 0, 500, 500);
    graphics.endFill();
    return graphics;
+}
+
+
+function updateStats()
+{
+   playerAttackText.Text( "Attack: " + "5" );
+   playerHealthText.setText( "Attack: " + player_health );
+   playerArmorText.setText( "Attack: " + player_armor );
 }
 
 
