@@ -38,8 +38,6 @@ game_stage.scale.y = GAME_SCALE;
 var master_stage = new PIXI.Container();
 var battle_screen;
 var player;
-var player_name;
-var player_text;
 var battle_x;
 var battle_y;
 var temp_x;
@@ -61,16 +59,13 @@ var enemies = [];
 var hand;
 var mode;
 var menu_text;
-var magic_text;
 var enemy_text;
-var item_text;
 var step = 10;
 var count = 1;
 var battle_active = false;
 var dialogue_active = false;
 var world;
 var tu;
-var playerDirection;
 var npc12112_dialogue = [];
 var npc4114_dialogue = [];
 var npc17113_dialogue = [];
@@ -93,6 +88,12 @@ var currentNPC = 0;
 var dialogueEnd = true;
 var dialogueBox;
 var dialogueText;
+var playerAttackText;
+var playerHealthText;
+var playerArmorText;
+var playerArmorArray = [];
+var currentHealthSprite;
+var currentArmorSprite;
 
 const PLAYERMOVEAMOUNT = 25;
 const PLAYER_START_X = PLAYERMOVEAMOUNT * 2;
@@ -122,6 +123,9 @@ const OGRE = 4;
 const EVIL_TREE = 5;
 const POSSESSED_SOLDIER = 6;
 const SKELETON = 7;
+const SHADOW_KING = 8;
+const SEXY_HENCHMAN = 9;
+const DEMON_LEECH = 10;
  
 function generateLevel() 
 {   
@@ -133,73 +137,198 @@ function generateLevel()
 	collidableArray = world.getObject("Collidable").data;
     teleportArray = world.getObject("Teleport").data;
     npcArray = world.getObject("NPC").data;
-	
-	player = createMovieClip( PLAYER_START_X, PLAYER_START_Y, 1, 1, "PlayerRight", 1, 3 );
-	playerDirection = RIGHT;
-	player_name = "Hero"; //Replace with user input
+	player = new Player();
+	game_stage.addChild( player.state );
+	//player = createMovieClip( PLAYER_START_X, PLAYER_START_Y, 1, 1, "PlayerRight", 1, 3 );
+	//playerDirection = RIGHT;
+	//player_name = "Hero"; //Replace with user input
    //player.anchor.x = .5;
 	//player.anchor.y = .5;
-	game_stage.addChild( player );
+	game_stage.addChild( player.state );
 	
-	enemy = new Enemy();
+	enemy = new Enemy({id: OGRE,
+						num_charges: 3,
+						x: 500, 
+						y: 800, 
+						state: createMovieClip( PLAYERMOVEAMOUNT * 20, PLAYERMOVEAMOUNT * 40,
+                                          1, 1, "Overworld_Ogre", 1, 3 ), 
+						name: "Ogre", 
+						attack: 3, 
+						speed: 2});
 	/*
 	enemy2 = new Enemy({id: GOBLIN,
 						num_charges: 1,
-						x: 700, 
-						y: 600, 
-						state: createMovieClip( 700, 600, 1, 1, "Goblin", 1, 2 ), 
+						x: PLAYERMOVEAMOUNT * , 
+						y: PLAYERMOVEAMOUNT * ,
+						state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
+                                          1, 1, "Goblin", 1, 2 ),  
 						name: "Goblin", 
 						attack: 1, 
 						speed: 6});*/
 	/*enemy2 = new Enemy({id: OGRE,
 						num_charges: 3,
-						x: 700, 
-						y: 600, 
-						state: createMovieClip( 700, 600, 1, 1, "Overworld_Ogre", 1, 3 ), 
+						x: PLAYERMOVEAMOUNT * , 
+						y: PLAYERMOVEAMOUNT * , 
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
+                                          1, 1, "Overworld_Ogre", 1, 3 ), 
 						name: "Ogre", 
 						attack: 3, 
 						speed: 2});*/
 	/*enemy2 = new Enemy({id: PIXIE,
 						num_charges: 2,
-						x: 700, 
-						y: 600, 
-						state: createMovieClip( 700, 600, 1, 1, "Overworld_Pixie", 1, 3 ), 
+						x: PLAYERMOVEAMOUNT * , 
+						y: PLAYERMOVEAMOUNT * ,
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
+                                          1, 1, "Overworld_Pixie", 1, 3 ), 
 						name: "Pixie", 
 						attack: 2, 
 						speed: 8});*/
 	/*enemy2 = new Enemy({id: POSSESSED_SOLDIER,
 						num_charges: 4,
-						x: 700, 
-						y: 600, 
-						state: createMovieClip( 700, 600, .6, .6, "Overworld_Possessed_Soldier", 1, 3 ), 
+						x: PLAYERMOVEAMOUNT * , 
+						y: PLAYERMOVEAMOUNT * , 
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
+                                          .6, .6, "Overworld_Possessed_Soldier", 1, 3 ), 
 						name: "Soldier", 
 						attack: 2, 
 						speed: 7});*/
 	/*enemy2 = new Enemy({id: SKELETON,
 						num_charges: 6,
-						x: 700, 
-						y: 600, 
-						state: createMovieClip( 700, 600, .8, .8, "Overworld_Skeleton", 1, 3 ), 
+						x: PLAYERMOVEAMOUNT * , 
+						y: PLAYERMOVEAMOUNT * ,
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
+                                          .8, .8, "Overworld_Skeleton", 1, 3 ),
 						name: "Skeleton", 
 						attack: 4, 
 						speed: 5});*/
+                  
 	enemy2 = new Enemy({id: EVIL_TREE,
 						num_charges: 5,
-						x: PLAYERMOVEAMOUNT * 43, 
-						y: PLAYERMOVEAMOUNT * 43, 
+						x: PLAYERMOVEAMOUNT * 36, 
+						y: PLAYERMOVEAMOUNT * 11, 
 						state: createMovieClip( PLAYERMOVEAMOUNT * 43, PLAYERMOVEAMOUNT * 43, 
                                           1, 1, "Overworld_Evil Tree", 1, 3 ), 
 						name: "Evil Tree", 
 						attack: 4, 
 						speed: 8});
+                  
+   enemy3 = new Enemy({id: GOBLIN,
+						num_charges: 1,
+						x: PLAYERMOVEAMOUNT * 18, 
+						y: PLAYERMOVEAMOUNT * 4,
+						state: createMovieClip( PLAYERMOVEAMOUNT * 18, PLAYERMOVEAMOUNT * 4,
+                                          1, 1, "Goblin", 1, 2 ), 
+						name: "Goblin", 
+						attack: 1, 
+						speed: 6});
+                  
+   enemy4 = new Enemy({id: GOBLIN,
+						num_charges: 1,
+						x: PLAYERMOVEAMOUNT * 16, 
+						y: PLAYERMOVEAMOUNT * 40,
+						state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
+                                          1, 1, "Goblin", 1, 2 ), 
+						name: "Goblin", 
+						attack: 1, 
+						speed: 6});
+   
+   enemy5 = new Enemy({id: GOBLIN,
+						num_charges: 1,
+						x: PLAYERMOVEAMOUNT * 8, 
+						y: PLAYERMOVEAMOUNT * 27,
+						state: createMovieClip( PLAYERMOVEAMOUNT * 8, PLAYERMOVEAMOUNT * 27,
+                                          1, 1, "Goblin", 1, 2 ),  
+						name: "Goblin", 
+						attack: 1, 
+						speed: 6});
+   
+   enemy6 = new Enemy({id: SHADOW_KING,
+						num_charges: 8,
+						x: PLAYERMOVEAMOUNT * 16, 
+						y: PLAYERMOVEAMOUNT * 24,
+						state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 20,
+                                          1, 1, "Overworld_Shadow_King", 1, 5 ), 
+						name: "Shadow King", 
+						attack: 1, 
+						speed: 6});
+                  
+   enemy7 = new Enemy({id: SEXY_HENCHMAN,
+						num_charges: 9,
+						x: PLAYERMOVEAMOUNT * 28, 
+						y: PLAYERMOVEAMOUNT * 39,
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 28, PLAYERMOVEAMOUNT * 39,
+                                          1, 1, "Overworld_Sexy_Henchman", 1, 5 ), 
+						name: "Sexy Henchman", 
+						attack: 2, 
+						speed: 8});
+   
+   enemy8 = new Enemy({id: DEMON_LEECH,
+						num_charges: 10,
+						x: PLAYERMOVEAMOUNT * 43, 
+						y: PLAYERMOVEAMOUNT * 29,
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 43, PLAYERMOVEAMOUNT * 29,
+                                          1, 1, "Demon_Leech", 1, 3 ), 
+						name: "Demon_Leech", 
+						attack: 0, 
+						speed: 8});
+   
+   enemy9 = new Enemy({id: PIXIE,
+						num_charges: 2,
+						x: PLAYERMOVEAMOUNT * 39, 
+						y: PLAYERMOVEAMOUNT * 4,
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 39, PLAYERMOVEAMOUNT * 4,
+                                          1, 1, "Overworld_Pixie", 1, 3 ), 
+						name: "Pixie", 
+						attack: 2, 
+						speed: 8});
+   
+   enemy10 = new Enemy({id: PIXIE,
+						num_charges: 2,
+						x: PLAYERMOVEAMOUNT * 30, 
+						y: PLAYERMOVEAMOUNT * 33,
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 30, PLAYERMOVEAMOUNT * 23,
+                                          1, 1, "Overworld_Pixie", 1, 3 ), 
+						name: "Pixie", 
+						attack: 2, 
+						speed: 8});
+                  
+   enemy11 = new Enemy({id: PIXIE,
+						num_charges: 2,
+						x: PLAYERMOVEAMOUNT * 7, 
+						y: PLAYERMOVEAMOUNT * 11,
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 7, PLAYERMOVEAMOUNT * 11,
+                                          1, 1, "Overworld_Pixie", 1, 3 ), 
+						name: "Pixie", 
+						attack: 2, 
+						speed: 8});
+   
 		
 	enemies.push( enemy );
 	enemies.push( enemy2 );
+	enemies.push( enemy3 );
+	enemies.push( enemy4 );
+	enemies.push( enemy5 );
+	enemies.push( enemy6 );
+	enemies.push( enemy7 );
+	enemies.push( enemy8 );
+	enemies.push( enemy9 );
+   enemies.push( enemy10 );
+   enemies.push( enemy11 );
    
    initialize_npc_dialogue();
 	
 	game_stage.addChild( enemy.state );
 	game_stage.addChild( enemy2.state );
+   game_stage.addChild( enemy3.state );
+	game_stage.addChild( enemy4.state );
+   game_stage.addChild( enemy5.state );
+	game_stage.addChild( enemy6.state );
+   game_stage.addChild( enemy7.state );
+   game_stage.addChild( enemy8.state );
+	game_stage.addChild( enemy9.state );
+   game_stage.addChild( enemy10.state );
+   game_stage.addChild( enemy11.state );
+   
 	document.addEventListener('keydown', keydownEventHandler);
 	
 	master_stage.addChild(game_stage);
@@ -212,7 +341,7 @@ function generateLevel()
 
 function generateBattleMenu() 
 {
-   if ( player_alive ) 
+   if ( player.is_alive ) 
    {
       battle_stage = new PIXI.Container();
 	  battle_text_stage = new PIXI.Container();
@@ -221,7 +350,7 @@ function generateBattleMenu()
       battle_text_stage.scale.y = 1.5;
       mode = RUN;
 	  
-	  battle_screen = new PIXI.Sprite(PIXI.Texture.fromImage("battle_menu_forest.png"));
+	  battle_screen = new PIXI.Sprite(PIXI.Texture.fromImage("battle_menu_cave.png"));
 	  battle_stage.addChild( battle_screen );
       
       if ( menu_text != null ) 
@@ -234,18 +363,16 @@ function generateBattleMenu()
       menu_text.position.y = 250;
 	  battle_text_stage.addChild( menu_text );
 	  
-	  player_text = new PIXI.extras.BitmapText(player_name, {font: "16px gamefont"});
-      player_text.position.x = 10;
-      player_text.position.y = 250;
-	  battle_text_stage.addChild( player_text );
+
+	  battle_text_stage.addChild( player.text );
 	  
-	  temp_x = player.position.x;
-	  temp_y = player.position.y;
-	  temp_direction = playerDirection;
+	  temp_x = player.state.position.x;
+	  temp_y = player.state.position.y;
+	  temp_direction = player.direction;
 	  
 	  swapPlayer( 100, 200, 5, 5, "PlayerRight", 1, 3 );
 	  
-	  battle_stage.addChild( player );
+	  battle_stage.addChild( player.state );
 	  
 	  current_enemy = checkTarget();
 	  current_enemy.visible = true;
@@ -280,6 +407,19 @@ function generateBattleMenu()
 				enemy_text.position.x -= 10;
 				current_enemy.state = createMovieClip( 205, 75, 1, 1, current_enemy.name, 1, 3 );
 				break;
+			case SHADOW_KING:
+				enemy_text.position.x -= 50;
+				current_enemy.state = createMovieClip( 225, 10, 2, 2, current_enemy.name, 1, 5 );
+				break;
+			case SEXY_HENCHMAN:
+				enemy_text.position.x -= 75;
+				current_enemy.state = createMovieClip( 250, 150, 1, 1, current_enemy.name, 1, 5 );
+				break;
+			case DEMON_LEECH:
+				enemy_text.position.x -= 50;
+				player.state.position.x -= 60;
+				current_enemy.state = createMovieClip( 150, -10, 1.5, 1.5, current_enemy.name, 1, 5 );
+				break;
 	  }
 	  
 	  battle_stage.addChild( current_enemy.state );
@@ -297,7 +437,7 @@ function generateBattleMenu()
 
 	  
       battle_text_stage.addChild( hand );
-	  battle_stage.addChild(battle_text_stage);
+	  battle_stage.addChild( battle_text_stage );
       master_stage.addChild( battle_stage );
    }
 }
@@ -307,28 +447,11 @@ function update()
 	requestAnimationFrame( update );
 	update_camera();
 	if ( battle_active ) { 
-		generateHealthMeter();
+		player.updateHealthBar();
 		current_enemy.updateHealthBar();
 		renderer.render( battle_stage ); }
 	else { 
-	removeDeadEnemies();
 	renderer.render( master_stage ); }
-}
-
-/**
-
-*/
-function removeDeadEnemies () {
-	for(var i in enemies){
-		var foe = enemies[i];
-		if(foe === current_enemy){
-			foe.state.visible = false;
-			delete foe;
-			game_stage.removeChild( foe.state );
-			//master_stage.removeChild( foe.state );
-			
-		}
-	}
 }
 
 /**
@@ -379,7 +502,7 @@ function checkEnemyPlayerCollisions(){
 
 	for(var i in enemies){
 		var foe = enemies[i];
-		if(checkRectangleCollision(player, foe.state)){
+		if(checkRectangleCollision(player.state, foe.state)){
 			foe.is_hit = true;
 			foe.state.visible = false;
 			game_stage.removeChild(foe);
@@ -400,16 +523,16 @@ var menu = StateMachine.create({
   initial: {state: 'run', event: 'init'},
   error: function() {},
   events: [
-    {name: "down", from: "fight", to: "steal"}, //fight->magic
+    {name: "down", from: "fight", to: "skill"}, //fight->magic
     //{name: "down", from: "magic", to: "steal"},
-    {name: "down", from: "steal", to: "item"},
+    {name: "down", from: "skill", to: "item"},
     {name: "down", from: "item", to: "run"},
     {name: "down", from: "run", to: "run"},
     
     {name: "up", from: "fight", to: "fight"},
     //{name: "up", from: "magic", to: "fight"},
-    {name: "up", from: "steal", to: "fight"}, //steal->magic
-    {name: "up", from: "item", to: "steal"},
+    {name: "up", from: "skill", to: "fight"}, //skill->magic
+    {name: "up", from: "item", to: "skill"},
     {name: "up", from: "run", to: "item"}
 
   ],
@@ -417,8 +540,8 @@ var menu = StateMachine.create({
     onfight: function() { moveHand(hand.position.x, menu_text.position.y + 
                            menu_text.height - 70); mode = FIGHT;},
     //onmagic: function() { moveHand(hand.position.x, player.position.y - 105); mode = 2; },
-    onsteal: function() { moveHand(hand.position.x, menu_text.position.y + 
-                           menu_text.height - 50); mode = STEAL;},
+    onskill: function() { moveHand(hand.position.x, menu_text.position.y + 
+                           menu_text.height - 50); mode = skill;},
     onitem: function() { moveHand(hand.position.x, menu_text.position.y + 
                            menu_text.height - 30); mode = ITEM;},
     onrun: function() { moveHand(hand.position.x, menu_text.position.y + 
@@ -430,11 +553,11 @@ var menu = StateMachine.create({
 function keydownEventHandler(event) {
    if( !game_stage.visible )
    {
-      player.x = PLAYER_START_X;
-      player.y = PLAYER_START_Y;
+      player.state.position.x = PLAYER_START_X;
+      player.state.position.y = PLAYER_START_Y;
    }
    
-   else if ( player_alive ) 
+   else if ( player.is_alive ) 
    {
       if ( !battle_active && !dialogue_active ) 
       {
@@ -443,18 +566,18 @@ function keydownEventHandler(event) {
          if ( event.keyCode == WKEY )
          {
             // Update the player sprite to upper facing player
-            player.y -= PLAYERMOVEAMOUNT;
-            swapPlayer( player.x, player.y, 1, 1, "PlayerUp", 1, 3  );
-            playerDirection = UP;
+            player.state.position.y -= PLAYERMOVEAMOUNT;
+            swapPlayer( player.state.position.x, player.state.position.y, 1, 1, "PlayerUp", 1, 3  );
+            player.direction = UP;
             
-            collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
-            teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
-            npc = tu.hitTestTile(player, npcArray, 0, world, "every");
+            collide = tu.hitTestTile(player.state, collidableArray, 0, world, "every");
+            teleport = tu.hitTestTile(player.state, teleportArray, 0, world, "every");
+            npc = tu.hitTestTile(player.state, npcArray, 0, world, "every");
             
             // Does player try to move to tile they shouldn't?
             if( !collide.hit || !npc.hit )
             {
-               player.y += PLAYERMOVEAMOUNT;
+               player.state.position.y += PLAYERMOVEAMOUNT;
             }
             
             // Does player transition to new area?
@@ -468,7 +591,7 @@ function keydownEventHandler(event) {
             {
                if ( count == 1 ) 
                {
-                  player.y += PLAYERMOVEAMOUNT;
+                  player.state.position.y += PLAYERMOVEAMOUNT;
                   generateBattleMenu( checkTarget() );
                   //alert("" + player.position.x);
                   count--;
@@ -479,18 +602,18 @@ function keydownEventHandler(event) {
          else if ( event.keyCode == SKEY ) 
          {
             // Update the player sprite to lower facing player
-            player.y += PLAYERMOVEAMOUNT;
-            swapPlayer( player.x, player.y, 1, 1, "PlayerDown", 1, 3  );
-            playerDirection = DOWN;
+            player.state.position.y += PLAYERMOVEAMOUNT;
+            swapPlayer( player.state.position.x, player.state.position.y, 1, 1, "PlayerDown", 1, 3  );
+            player.direction = DOWN;
             
-            collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
-            teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
-            npc = tu.hitTestTile(player, npcArray, 0, world, "every");
+            collide = tu.hitTestTile(player.state, collidableArray, 0, world, "every");
+            teleport = tu.hitTestTile(player.state, teleportArray, 0, world, "every");
+            npc = tu.hitTestTile(player.state, npcArray, 0, world, "every");
             
             // Does player try to move to tile they shouldn't?
             if( !collide.hit || !npc.hit )
             {
-               player.y -= PLAYERMOVEAMOUNT;
+               player.state.position.y -= PLAYERMOVEAMOUNT;
             }
             
             // Does player transition to new area?
@@ -504,7 +627,7 @@ function keydownEventHandler(event) {
             {
                if ( count == 1 ) 
                {
-                  player.y -= PLAYERMOVEAMOUNT;
+                  player.state.position.y -= PLAYERMOVEAMOUNT;
                   generateBattleMenu();
                   //alert("" + player.position.x);
                   count--;
@@ -516,18 +639,18 @@ function keydownEventHandler(event) {
          else if ( event.keyCode == AKEY ) 
          {
             // Update the player sprite to left facing player
-            player.x -= PLAYERMOVEAMOUNT;
-            swapPlayer( player.x, player.y, 1, 1, "PlayerLeft", 1, 3  );
-            playerDirection = LEFT;
+			player.state.position.x -= PLAYERMOVEAMOUNT;
+            swapPlayer( player.state.position.x, player.state.position.y, 1, 1, "PlayerLeft", 1, 3  );
+            player.direction = LEFT;
             
-            collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
-            teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
-            npc = tu.hitTestTile(player, npcArray, 0, world, "every");
+            collide = tu.hitTestTile(player.state, collidableArray, 0, world, "every");
+            teleport = tu.hitTestTile(player.state, teleportArray, 0, world, "every");
+            npc = tu.hitTestTile(player.state, npcArray, 0, world, "every");
             
             // Does player try to move to tile they shouldn't?
             if( !collide.hit || !npc.hit )
             {
-               player.x += PLAYERMOVEAMOUNT;
+               player.state.position.x += PLAYERMOVEAMOUNT;
             }
             
             // Does player transition to new area?
@@ -541,7 +664,7 @@ function keydownEventHandler(event) {
             {
                if ( count == 1 ) 
                {
-                  player.x += PLAYERMOVEAMOUNT;
+                  player.state.position.x += PLAYERMOVEAMOUNT;
                   generateBattleMenu();
                   //alert("" + player.position.x);
                   count--;
@@ -552,18 +675,18 @@ function keydownEventHandler(event) {
          else if ( event.keyCode == DKEY ) 
          {
             // Update the player sprite to right facing player
-            player.x += PLAYERMOVEAMOUNT;
-            swapPlayer( player.x, player.y, 1, 1, "PlayerRight", 1, 3  );
-            playerDirection = RIGHT; 
+            player.state.position.x += PLAYERMOVEAMOUNT;
+            swapPlayer( player.state.position.x, player.state.position.y, 1, 1, "PlayerRight", 1, 3  );
+            player.direction = RIGHT; 
             
-            collide = tu.hitTestTile(player, collidableArray, 0, world, "every");
-            teleport = tu.hitTestTile(player, teleportArray, 0, world, "every");
-            npc = tu.hitTestTile(player, npcArray, 0, world, "every");
+            collide = tu.hitTestTile(player.state, collidableArray, 0, world, "every");
+            teleport = tu.hitTestTile(player.state, teleportArray, 0, world, "every");
+            npc = tu.hitTestTile(player.state, npcArray, 0, world, "every");
             
             // Does player try to move to tile they shouldn't?
             if( !collide.hit || !npc.hit )
             {
-               player.x -= PLAYERMOVEAMOUNT;
+               player.state.position.x -= PLAYERMOVEAMOUNT;
             }
             
             // Does player transition to new area?
@@ -577,7 +700,7 @@ function keydownEventHandler(event) {
             {
                if ( count == 1 ) 
                {
-                  player.x -= PLAYERMOVEAMOUNT;
+                  player.state.position.x -= PLAYERMOVEAMOUNT;
                   generateBattleMenu();
                   //alert("" + player.position.x);
                   count--;
@@ -620,7 +743,7 @@ function keydownEventHandler(event) {
             
             if ( mode == FIGHT ) { fight( checkTarget() ); }
 
-            else  if ( mode == STEAL ) { steal( checkTarget() ); }
+            else  if ( mode == skill ) { skill( checkTarget() ); }
 
             else  if ( mode == ITEM ) { useItem( checkTarget() ); }
          
@@ -664,17 +787,17 @@ function checkNPCInteraction()
 function checkValidInteraction( npcX, npcY )
 {
 
-   if( (playerDirection == UP && 
-       npcX * 25 == player.x && npcY * 25 + 25 == player.y) ||  
+   if( (player.direction == UP && 
+       npcX * 25 == player.state.position.x && npcY * 25 + 25 == player.state.position.y) ||  
        
-       (playerDirection == DOWN && 
-       npcX * 25 == player.x && npcY * 25 - 25 == player.y) ||
+       (player.direction == DOWN && 
+       npcX * 25 == player.state.position.x && npcY * 25 - 25 == player.state.position.y) ||
        
-       (playerDirection == LEFT && 
-       npcX * 25 + 25 == player.x && npcY * 25 == player.y) ||
+       (player.direction == LEFT && 
+       npcX * 25 + 25 == player.state.position.x && npcY * 25 == player.state.position.y) ||
        
-       (playerDirection == RIGHT && 
-       npcX * 25 - 25 == player.x && npcY * 25 == player.y)  )
+       (player.direction == RIGHT && 
+       npcX * 25 - 25 == player.state.position.x && npcY * 25 == player.state.position.y)  )
    {
       currentNPC = parseInt("" + npcX + npcY);
       getCurrentLine();
@@ -691,7 +814,7 @@ function getCurrentLine()
          if( !npc12112_talked_to )
          {
             currentArray = npc12112_dialogue;
-            player_attack++;
+            player.attack++;
             npc12112_talked_to = true;
          }
          
@@ -721,8 +844,8 @@ function getCurrentLine()
          break;
       case 33121:
          currentArray = npc33121_dialogue;
-         player_armor = player_max_armor;
-         player_health = 10;
+         player.armor = player.max_armor;
+         player.health = 10;
          break;
       case 34107:
          currentArray = npc34107_dialogue;
@@ -737,8 +860,10 @@ function getCurrentLine()
          if( !npc40121_talked_to )
          {
             currentArray = npc40121_dialogue;
-            player_armor++;
-            player_max_armor++;
+            player.armor++;
+            player.max_armor++;
+           // player_armor++;
+           // player_max_armor++;
             npc40121_talked_to = true;
          }
          
@@ -791,7 +916,6 @@ function initialize_npc_dialogue()
                             "my generosity even more? Greedy lil\n"+
                             "bugger...");
    
-   // Needs enter when longer than --------------------------------
    npc4114_dialogue.push( "I am a town guard, I help keep this\n"+
                           "place safe!" );
    
@@ -801,10 +925,10 @@ function initialize_npc_dialogue()
    npc17113_dialogue.push( "You there, please help! There is a\n"+
                            "monster that is going to wipe out the\n"+
                            "world!" );
-   npc17113_dialogue.push( "She may look like a regular woman,\n"+
-                           "but she is the devil incarnate! Please\n"+
-                           "help us!" );
-   npc17113_dialogue.push( "You would be hailed a hero if she were\n"+
+   npc17113_dialogue.push( "He is only known as the Shadow King,\n"+
+                           "and he is going to suck the life from\n" + 
+						   "this world! Please help us!" );
+   npc17113_dialogue.push( "You would be hailed a hero if he were\n"+
                            "slain by your hand!" );
    
    // Needs enter when longer than --------------------------------
@@ -893,74 +1017,74 @@ function teleportPlayer( teleportIndex )
    switch( teleportIndex )
    {
       case 10644:
-         player.x = PLAYERMOVEAMOUNT * 4;
-         player.y = PLAYERMOVEAMOUNT * 3;
-         swapPlayer( player.x, player.y, 1, 1, "PlayerDown", 1, 3  );
-         playerDirection = DOWN;
+         player.state.position.x = PLAYERMOVEAMOUNT * 4;
+         player.state.position.y = PLAYERMOVEAMOUNT * 3;
+         swapPlayer( player.state.position.x, player.state.position.y, 1, 1, "PlayerDown", 1, 3  );
+         player.direction = DOWN;
          break;
          
       case 204:
-         player.x = PLAYERMOVEAMOUNT * 44;
-         player.y = PLAYERMOVEAMOUNT * 107;
-         swapPlayer( player.x, player.y, 1, 1, "PlayerDown", 1, 3  );
-         playerDirection = DOWN;
+         player.state.position.x = PLAYERMOVEAMOUNT * 44;
+         player.state.position.y = PLAYERMOVEAMOUNT * 107;
+         swapPlayer( player.state.position.x, player.state.position.y, 1, 1, "PlayerDown", 1, 3  );
+         player.direction = DOWN;
          break;
       
       case 4544:
-         player.x = PLAYERMOVEAMOUNT * 55;
-         player.y = PLAYERMOVEAMOUNT * 44;
-         swapPlayer( player.x, player.y, 1, 1, "PlayerUp", 1, 3  );
-         playerDirection = UP;
+         player.state.position.x = PLAYERMOVEAMOUNT * 55;
+         player.state.position.y = PLAYERMOVEAMOUNT * 44;
+         swapPlayer(player.state.position.x, player.state.position.y, 1, 1, "PlayerUp", 1, 3  );
+         player.direction = UP;
          break;
       
       case 4555:
-         player.x = PLAYERMOVEAMOUNT * 44;
-         player.y = PLAYERMOVEAMOUNT * 44;
-         swapPlayer( player.x, player.y, 1, 1, "PlayerUp", 1, 3  );
-         playerDirection = UP;
-         break;
+        player.state.position.x = PLAYERMOVEAMOUNT * 44;
+        player.state.position.y = PLAYERMOVEAMOUNT * 44;
+        swapPlayer( player.state.position.x, player.state.position.y, 1, 1, "PlayerUp", 1, 3  );
+        player.direction = UP;
+        break;
       
       case 495:
-         player.x = PLAYERMOVEAMOUNT * 55;
-         player.y = PLAYERMOVEAMOUNT * 107;
-         swapPlayer( player.x, player.y, 1, 1, "PlayerDown", 1, 3  );
-         playerDirection = DOWN;
-         break;
+        player.state.position.x = PLAYERMOVEAMOUNT * 55;
+        player.state.position.y = PLAYERMOVEAMOUNT * 107;
+        swapPlayer( player.state.position.x, player.state.position.y, 1, 1, "PlayerDown", 1, 3  );
+        player.direction = DOWN;
+        break;
       
       case 10655:
-         player.x = PLAYERMOVEAMOUNT * 95;
-         player.y = PLAYERMOVEAMOUNT * 5;
-         swapPlayer( player.x, player.y, 1, 1, "PlayerDown", 1, 3  );
-         playerDirection = DOWN;
+         player.state.position.x = PLAYERMOVEAMOUNT * 95;
+         player.state.position.y = PLAYERMOVEAMOUNT * 5;
+         swapPlayer( player.state.position.x, player.state.position.y, 1, 1, "PlayerDown", 1, 3  );
+         player.direction = DOWN;
          break;
       
       case 10698:
-         player.x = PLAYERMOVEAMOUNT * 1;
-         player.y = PLAYERMOVEAMOUNT * 94;
-         swapPlayer( player.x, player.y, 1, 1, "PlayerUp", 1, 3  );
-         playerDirection = UP;
+         player.state.position.x = PLAYERMOVEAMOUNT * 1;
+         player.state.position.y = PLAYERMOVEAMOUNT * 94;
+         swapPlayer( player.state.position.x,player.state.position.y, 1, 1, "PlayerUp", 1, 3  );
+         player.direction = UP;
          break;
          
       case 9501:
-         player.x = PLAYERMOVEAMOUNT * 98;
-         player.y = PLAYERMOVEAMOUNT * 107;
-         swapPlayer( player.x, player.y, 1, 1, "PlayerDown", 1, 3  );
-         playerDirection = DOWN;
+        player.state.position.x = PLAYERMOVEAMOUNT * 98;
+        player.state.position.y = PLAYERMOVEAMOUNT * 107;
+         swapPlayer( player.state.position.x, player.state.position.y, 1, 1, "PlayerDown", 1, 3  );
+         player.direction = DOWN;
          break;
       
       case 5644:
-         player.x = PLAYERMOVEAMOUNT * 55;
-         player.y = PLAYERMOVEAMOUNT * 57;
-         swapPlayer( player.x, player.y, 1, 1, "PlayerDown", 1, 3  );
-         playerDirection = DOWN;
-         break;
+        player.state.position.x = PLAYERMOVEAMOUNT * 55;
+        player.state.position.y = PLAYERMOVEAMOUNT * 57;
+        swapPlayer( player.state.position.x, player.state.position.y, 1, 1, "PlayerDown", 1, 3  );
+        player.direction = DOWN;
+        break;
       
       case 5655:
-         player.x = PLAYERMOVEAMOUNT * 44;
-         player.y = PLAYERMOVEAMOUNT * 57;
-         swapPlayer( player.x, player.y, 1, 1, "PlayerDown", 1, 3  );
-         playerDirection = DOWN;
-         break;
+        player.state.position.x = PLAYERMOVEAMOUNT * 44;
+        player.state.position.y = PLAYERMOVEAMOUNT * 57;
+        swapPlayer( player.state.position.x, player.state.position.y, 1, 1, "PlayerDown", 1, 3  );
+        player.direction = DOWN;
+        break;
    }
 }
 
@@ -978,14 +1102,14 @@ function buildScreens() {
 
     // Text for titles
    var gameStatsText = new PIXI.Text( "Stats", {fill : 0x000000} );
-   var playerAttackText = new PIXI.Text( "Attack:", {fill : 0xFFFFFF} );
+   var playerAttackText = new PIXI.Text( "Attack:" , {fill : 0xFFFFFF} );
    var playerHealthText = new PIXI.Text( "Health:", {fill : 0xFFFFFF} );
    var playerArmorText = new PIXI.Text( "Armor:", {fill : 0xFFFFFF} );
    var gameTitleText = new PIXI.Text( "RPG!", {fill : 0xFFFFFF} );
    var gameInstructTitleText = new PIXI.Text( "Instructions", {fill : 0xFFFFFF} );
    var gameCreditTitleText = new PIXI.Text( "Credits", {fill : 0xFFFFFF} );
    var gameWinText = new PIXI.Text( "Game over!\nYou win!", {fill : 0xFFFFFF} );
-   var gameLoseText = new PIXI.Text("Game over!\nThe Shadow King has conquered Terra.", {fill : 0xFFFFFF} );
+   var gameLoseText = new PIXI.Text("Game over!\nThe World has been consumed.", {fill : 0xFFFFFF} );
 
    // Text for title screen options
    var gameStartText = new PIXI.Text( "Start", {fill : 0xFFFFFF} );
@@ -1027,9 +1151,21 @@ function buildScreens() {
    
    // Declares interactable text functions
    gameStatsText.click = function(event) { statsScreen.visible = true;
-                                           updateStats(); }
+                                           playerAttackText.setText( "Attack: " + player.attack );
+                                           currentHealthSprite = createSprite( 103, 437, 1, 1, "ex_meter" + 
+                                                                  player.health + ".png" );
+                                           statsScreen.addChild( currentHealthSprite );
+                                           
+                                           currentArmorSprite = createSprite( 103, 470, 1, 1, "armor" + 
+                                                                  player.armor + ".png" );
+                                           statsScreen.addChild( currentArmorSprite );
+                                           
+                                           }
    
-   gameStatsBackText.click = function(event) { statsScreen.visible = false; }
+   gameStatsBackText.click = function(event) { statsScreen.visible = false; 
+                                               statsScreen.removeChild( currentHealthSprite );
+                                               statsScreen.removeChild( currentArmorSprite );
+                                           }
                                            
    gameStartText.click = function(event) { startScreen.visible = false; 
                                            game_stage.visible = true;
@@ -1164,14 +1300,6 @@ function createShape() {
 }
 
 
-function updateStats()
-{
-   playerAttackText.Text( "Attack: " + "5" );
-   playerHealthText.setText( "Attack: " + player_health );
-   playerArmorText.setText( "Attack: " + player_armor );
-}
-
-
 function checkTarget(){
 
 	for(var i in enemies){
@@ -1183,16 +1311,16 @@ function checkTarget(){
 }
 
 function fight( foe ) { //Pass in enemy
-  if( player_speed > foe.speed ) {
+  if( player.speed > foe.speed ) {
 	playerAttack( foe );
 	
-	if ( player_alive && foe.is_alive ) {
+	if ( player.is_alive && foe.is_alive ) {
 		enemyAttack( foe ); //Pass in enemy
 	}
   }
 
   else {
-	if ( player_alive && foe.is_alive ) {
+	if ( player.is_alive && foe.is_alive ) {
 		enemyAttack( foe ); //Pass in enemy
 	}
 	
@@ -1204,7 +1332,7 @@ function fight( foe ) { //Pass in enemy
 	Handles player attack in combat
 */
 function playerAttack( foe ) {
-	if (player_alive) {
+	if (player.is_alive) {
 		//alert("Your attack hit the enemy for " + player_attack + " damage.");
 		/**
 		swapPlayer( 100, 200, 5, 5, "PlayerAttack", 1, 3  );
@@ -1222,10 +1350,10 @@ function playerAttack( foe ) {
 		
 		foe.onComplete = animationFinished;*/
 
-		foe.health -= player_attack;
+		foe.health -= player.attack;
 		
-		if( player_boost ) {
-			player_health--;
+		if( player.is_boosted ) {
+			player.health--;
 		}
 
 		if ( foe.health <= 0 ) { 
@@ -1233,6 +1361,7 @@ function playerAttack( foe ) {
 			//alert("The enemy has been slain.");
 			if (foe.num_charges <= 1) {
 				foe.is_alive = false;
+				player.attack++;
 				var index = enemies.indexOf( foe );
 				if (index > -1) {
 					enemies.splice(index, 1);
@@ -1255,50 +1384,51 @@ function enemyAttack( foe ) {
 		
 		if ( enemy_chance < 8 ) {
 			//alert( "The enemy hits you for " + foe.attack + " damage." );
-			player_health -= foe.attack;
+			player.health -= foe.attack;
 		}
 
 		else {
 			//alert("The enemy misses their attack.");
 		}
 
-		if ( player_health <= 0 ) {
+		if ( player.health <= 0 ) {
 			//alert("You have fallen in battle. ;-;");
-			if ( player_armor <= 1 ) {
-				game_stage.removeChild( player ); 
-				game_stage.removeChild( health_meter );
-				player.stop();
-				player_alive = false;
+			if ( player.armor <= 1 ) {
+				game_stage.removeChild( player.state );
+				
+				player.state.stop();
+				player.is_alive = false;
 				endBattle( foe );
 			}
-         player_armor--;
+			
+         player.armor--;
 		}
 	}
 }
 
 /**
-	Helper function that handles steal action in combat
+	Helper function that handles skill action in combat
 */
-function steal( foe ) {
-	if( player_speed > foe.speed ) {
-			if(!player_boost) {
-			player_boost = true;
-			player_attack *= 2;
+function skill( foe ) {
+	if( player.speed > foe.speed ) {
+			if(!player.is_boosted) {
+			player.is_boosted = true;
+			player.attack *= 2;
 	}
 	
-		if ( player_alive && foe.is_alive ) {
+		if ( player.is_alive && foe.is_alive ) {
 			enemyAttack( foe ); //Pass in enemy
 		}
 	}
 
 	else {
-		if ( player_alive && foe.is_alive ) {
+		if ( player.is_alive && foe.is_alive ) {
 			enemyAttack( foe ); //Pass in enemy
 		}
 	
-		if(!player_boost) {
-			player_boost = true;
-			player_attack *= 2;
+		if(!player.is_boosted) {
+			player.is_boosted = true;
+			player.attack *= 2;
 		}
   }
 }
@@ -1308,7 +1438,7 @@ function steal( foe ) {
 */
 function useItem( foe ) {
 	//alert("You drink a health potion.");
-	player_health += getRand(3) + 2; //30% - 50%
+	player.health += getRand(3) + 2; //30% - 50%
 	enemyAttack( foe );
 }
 
@@ -1329,36 +1459,6 @@ function run( foe ) {
 	}
 }
 
-/**
-	Helper function that displays the health meter
-*/
-function generateHealthMeter () {
-	if ( health_meter != null ) {
-		battle_stage.removeChild( health_meter );
-		delete health_meter;
-	}
-	
-	if ( player_armor > 0 ) {
-		if ( player_health <= 0 ) { player_health += 10; }
-	}
-	
-	player_threat_stage.removeChildren();
-	
-	for ( var i = player_armor; i > 0; i-- ) {
-				danger_level = createSprite( (i*25) - 25, player.position.y + 210, 1.5, 1.5, "armor.png");
-				
-				player_threat_stage.addChild( danger_level );
-	}
-	
-	if ( player_health < 0 ) { player_health = 0; }
-
-	if ( player_health > 10 ) { player_health = 10; }
-
-	if ( player_alive ) {
-		health_meter = createSprite( player.position.x - 100, player.position.y + 200, .5, .5, ( "ex_meter" + ( Math.round( player_health ) ) + ".png" ) );
-		battle_stage.addChild( health_meter );
-	}
-}
 
 /**
 	Helper function that ends the battle
@@ -1366,13 +1466,11 @@ function generateHealthMeter () {
 function endBattle ( foe ) {
 	battle_active = false;
 	foe.is_hit = false;
-	player_boost = false;
-	player_attack /= 2;
+	player.is_boosted = false;
 	moveHand(hand.position.x, menu_text.position.y + 
                            menu_text.height - 10);
 	mode = RUN;
 	count = 1;
-	foe.removeEnemy();
 	clearBattleScreen();
 }
 
@@ -1380,7 +1478,7 @@ function clearBattleScreen() {
 	battle_text_stage.removeChild( hand );
 	battle_text_stage.removeChild( menu_text );
 	battle_stage.removeChild( battle_screen );
-	battle_stage.removeChild( player );
+	battle_stage.removeChild( player.state );
 	
 	switch ( temp_direction ) {
 			case UP:
@@ -1450,9 +1548,9 @@ function createMovieClip ( x, y, scale_x, scale_y, image, low, high ) {
 	Helper function that swaps the player sprite
 */
 function swapPlayer ( x, y, scale_x, scale_y, image, low, high ) {
-	game_stage.removeChild( player );
-	player = createMovieClip( x, y, scale_x, scale_y, image, low, high );
-	game_stage.addChild( player );
+	game_stage.removeChild( player.state );
+	player.state = createMovieClip( x, y, scale_x, scale_y, image, low, high );
+	game_stage.addChild( player.state );
 }
 
 
@@ -1467,8 +1565,8 @@ function getRand( max ) {
 	Updates the camera
 */
 function update_camera() {
-  game_stage.x = -player.x*GAME_SCALE + GAME_WIDTH/2 - player.width/2*GAME_SCALE;
-  game_stage.y = -player.y*GAME_SCALE + GAME_HEIGHT/2 + player.height/2*GAME_SCALE;
+  game_stage.x = -player.state.position.x*GAME_SCALE + GAME_WIDTH/2 - player.state.width/2*GAME_SCALE;
+  game_stage.y = -player.state.position.y*GAME_SCALE + GAME_HEIGHT/2 + player.state.height/2*GAME_SCALE;
   game_stage.x = -Math.max(0, Math.min(world.worldWidth*GAME_SCALE - GAME_WIDTH, -game_stage.x));
   game_stage.y = -Math.max(0, Math.min(world.worldHeight*GAME_SCALE - GAME_HEIGHT, -game_stage.y)); 
 }
@@ -1508,7 +1606,6 @@ function Enemy(obj) {
         this.name = obj.name;
 		this.health = 10;
 		this.health_meter = createSprite( 350, 400, .5, .5, ( "ex_meter10.png" ) );
-		
 		this.attack = obj.attack;
 		this.speed = obj.speed;
 		this.is_alive = true;
@@ -1523,13 +1620,36 @@ function Enemy(obj) {
 Enemy.prototype.updateHealthBar = function () {
     'use strict';
 	if ( this.num_charges > 0 ) {
-		if ( this.health <= 0 ) { this.health += 10; }
+		if ( this.health < 0 ) {
+			while ( this.health < -10 ) {
+				this.num_charges--;
+				this.health += 10;
+			}
+			this.health += 10; 
+		}
+	}
+	
+	if ( this.num_charges <= 0 || this.health == 0 ) {
+		this.is_alive = false;
+		player.attack++;
+		var index = enemies.indexOf( this );
+		if (index > -1) {
+			enemies.splice(index, 1);
+		}
+		
+		endBattle(this);
 	}
 	
 	threat_stage.removeChildren();
 	
 	for ( var i = this.num_charges; i > 0; i-- ) {
+			if ( current_enemy.id === DEMON_LEECH ) {
+				danger_level = createMovieClip( 495 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
+			}
+			
+			else {
 				danger_level = createMovieClip( 470 - (i*25), 410, .8, .8, "laughing_skull", 1, 5 );
+			}
 				
 				threat_stage.addChild( danger_level );
 	}
@@ -1556,11 +1676,99 @@ Enemy.prototype.loseCharge = function () {
 	this.num_charges--;
 };
 
-Enemy.prototype.removeEnemy = function () {
-	this.state.visible = false;
-	this.state.stop();
-	this.state.destroy();
-	game_stage.removeChild( this.state );
+
+/**
+---------------------------------------------------
+Player Class
+---------------------------------------------------
+Example:
+player = new Player({name: "Hero", 
+					 state: createMovieClip( PLAYER_START_X, PLAYER_START_Y, 1, 1, "PlayerRight", 1, 3 ),  
+					 attack: 1, 
+					 armor: 1,
+					 speed: 2}); 	//instantiation
+enemy.updateHealthBar(); 																			//calling a method     
+*/
+function Player(obj) {
+    'use strict';
+    if (typeof obj === "undefined") { // DEFAULT
+		this.name = "Hero";
+		this.state = createMovieClip( PLAYER_START_X, PLAYER_START_Y, 1, 1, "PlayerRight", 1, 3 );
+		this.text = new PIXI.extras.BitmapText(this.name, {font: "16px gamefont"});
+		this.text.position.x = 10;
+		this.text.position.y = 250;
+		this.health = 10;
+		this.attack = 99;
+		this.health_meter;
+		this.is_alive = true;
+		this.is_boosted = false;
+		this.armor = 1;
+		this.max_armor = 1;
+		this.speed = 5;
+		this.direction = RIGHT;
+	}
+	
+	else {
+		this.name = obj.name;
+		this.state = obj.state;
+		this.text = new PIXI.extras.BitmapText(this.name, {font: "16px gamefont"});
+		this.text.position.x = 10;
+		this.text.position.y = 250;
+		this.health = 10;
+		this.attack = obj.attack;
+		this.health_meter;
+		this.is_alive = true;
+		this.is_boosted = false;
+		this.armor = obj.armor;
+		this.max_armor = this.armor;
+		this.speed = obj.speed;
+		this.direction = RIGHT;
+    }
+
+}
+
+/**
+	Updates the enemy health meter
+*/
+Player.prototype.updateHealthBar = function () {
+    'use strict';
+	if ( this.health_meter != null ) {
+		battle_stage.removeChild( this.health_meter );
+		delete this.health_meter;
+	}
+	
+	if ( this.armor > 0 ) {
+		if ( this.health <= 0 ) { this.health += 10; }
+	}
+	
+	player_threat_stage.removeChildren();
+	
+	for ( var i = this.armor; i > 0; i-- ) {
+				danger_level = createSprite( (i*25) - 25, this.state.position.y + 210, 1.5, 1.5, "armor.png");
+				
+				player_threat_stage.addChild( danger_level );
+	}
+	
+	if ( this.health < 0 ) { this.health = 0; }
+
+	if ( this.health > 10 ) { this.health = 10; }
+
+	if ( this.is_alive ) {
+		if ( current_enemy.id === DEMON_LEECH ) {
+			this.health_meter = createSprite( this.state.position.x - 40, this.state.position.y + 200, .5, .5, ( "ex_meter" + ( Math.round( this.health ) ) + ".png" ) );
+		}
+		
+		else {
+			this.health_meter = createSprite( this.state.position.x - 100, this.state.position.y + 200, .5, .5, ( "ex_meter" + ( Math.round( this.health ) ) + ".png" ) );
+		}
+		battle_stage.addChild( this.health_meter );
+	}
 };
 
+Player.prototype.addArmor = function () {
+	this.armor++;
+};
 
+Player.prototype.loseCharge = function () {
+	this.armor--;
+};
