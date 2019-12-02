@@ -139,13 +139,6 @@ function generateLevel()
     npcArray = world.getObject("NPC").data;
 	player = new Player();
 	game_stage.addChild( player.state );
-	//player = createMovieClip( PLAYER_START_X, PLAYER_START_Y, 1, 1, "PlayerRight", 1, 3 );
-	//playerDirection = RIGHT;
-	//player_name = "Hero"; //Replace with user input
-   //player.anchor.x = .5;
-	//player.anchor.y = .5;
-	game_stage.addChild( player.state );
-	
 	enemy = new Enemy({id: OGRE,
 						num_charges: 3,
 						x: 500, 
@@ -1395,7 +1388,6 @@ function enemyAttack( foe ) {
 			//alert("You have fallen in battle. ;-;");
 			if ( player.armor <= 1 ) {
 				game_stage.removeChild( player.state );
-				
 				player.state.stop();
 				player.is_alive = false;
 				endBattle( foe );
