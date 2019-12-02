@@ -81,6 +81,15 @@ var currentNPC = 0;
 var dialogueEnd = true;
 var dialogueBox;
 var dialogueText;
+<<<<<<< Updated upstream
+=======
+var playerAttackText;
+var playerHealthText;
+var playerArmorText;
+var playerArmorArray = [];
+var currentHealthSprite;
+var currentArmorSprite;
+>>>>>>> Stashed changes
 
 const PLAYERMOVEAMOUNT = 25;
 const FIGHT = 100;
@@ -177,14 +186,133 @@ function generateLevel()
 						name: "Evil Tree", 
 						attack: 4, 
 						speed: 8});
+<<<<<<< Updated upstream
 		
 	enemies.push( enemy );
 	enemies.push( enemy2 );
+=======
+                  
+   enemy3 = new Enemy({id: GOBLIN,
+						num_charges: 1,
+						x: PLAYERMOVEAMOUNT * 18, 
+						y: PLAYERMOVEAMOUNT * 4,
+						state: createMovieClip( PLAYERMOVEAMOUNT * 18, PLAYERMOVEAMOUNT * 4,
+                                          1, 1, "Goblin", 1, 2 ), 
+						name: "Goblin", 
+						attack: 1, 
+						speed: 6});
+                  
+   enemy4 = new Enemy({id: GOBLIN,
+						num_charges: 1,
+						x: PLAYERMOVEAMOUNT * 16, 
+						y: PLAYERMOVEAMOUNT * 40,
+						state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 40,
+                                          1, 1, "Goblin", 1, 2 ), 
+						name: "Goblin", 
+						attack: 1, 
+						speed: 6});
+   
+   enemy5 = new Enemy({id: GOBLIN,
+						num_charges: 1,
+						x: PLAYERMOVEAMOUNT * 8, 
+						y: PLAYERMOVEAMOUNT * 27,
+						state: createMovieClip( PLAYERMOVEAMOUNT * 8, PLAYERMOVEAMOUNT * 27,
+                                          1, 1, "Goblin", 1, 2 ),  
+						name: "Goblin", 
+						attack: 1, 
+						speed: 6});
+   
+   enemy6 = new Enemy({id: GOBLIN,
+						num_charges: 1,
+						x: PLAYERMOVEAMOUNT * 16, 
+						y: PLAYERMOVEAMOUNT * 20,
+						state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 20,
+                                          1, 1, "Goblin", 1, 2 ), 
+						name: "Goblin", 
+						attack: 1, 
+						speed: 6});
+                  
+   enemy7 = new Enemy({id: PIXIE,
+						num_charges: 2,
+						x: PLAYERMOVEAMOUNT * 28, 
+						y: PLAYERMOVEAMOUNT * 39,
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 28, PLAYERMOVEAMOUNT * 39,
+                                          1, 1, "Overworld_Pixie", 1, 3 ), 
+						name: "Pixie", 
+						attack: 2, 
+						speed: 8});
+   
+   enemy8 = new Enemy({id: PIXIE,
+						num_charges: 2,
+						x: PLAYERMOVEAMOUNT * 43, 
+						y: PLAYERMOVEAMOUNT * 29,
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 43, PLAYERMOVEAMOUNT * 29,
+                                          1, 1, "Overworld_Pixie", 1, 3 ), 
+						name: "Pixie", 
+						attack: 2, 
+						speed: 8});
+   
+   enemy9 = new Enemy({id: PIXIE,
+						num_charges: 2,
+						x: PLAYERMOVEAMOUNT * 39, 
+						y: PLAYERMOVEAMOUNT * 4,
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 39, PLAYERMOVEAMOUNT * 4,
+                                          1, 1, "Overworld_Pixie", 1, 3 ), 
+						name: "Pixie", 
+						attack: 2, 
+						speed: 8});
+   
+   enemy10 = new Enemy({id: PIXIE,
+						num_charges: 2,
+						x: PLAYERMOVEAMOUNT * 30, 
+						y: PLAYERMOVEAMOUNT * 23,
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 30, PLAYERMOVEAMOUNT * 23,
+                                          1, 1, "Overworld_Pixie", 1, 3 ), 
+						name: "Pixie", 
+						attack: 2, 
+						speed: 8});
+                  
+   enemy11 = new Enemy({id: PIXIE,
+						num_charges: 2,
+						x: PLAYERMOVEAMOUNT * 7, 
+						y: PLAYERMOVEAMOUNT * 11,
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 7, PLAYERMOVEAMOUNT * 11,
+                                          1, 1, "Overworld_Pixie", 1, 3 ), 
+						name: "Pixie", 
+						attack: 2, 
+						speed: 8});
+   
+		
+	enemies.push( enemy );
+	enemies.push( enemy2 );
+   enemies.push( enemy3 );
+	enemies.push( enemy4 );
+   enemies.push( enemy5 );
+	enemies.push( enemy6 );
+   enemies.push( enemy7 );
+   enemies.push( enemy8 );
+	enemies.push( enemy9 );
+   enemies.push( enemy10 );
+   enemies.push( enemy11 );
+>>>>>>> Stashed changes
    
     initialize_npc_dialogue();
 	
 	game_stage.addChild( enemy.state );
 	game_stage.addChild( enemy2.state );
+<<<<<<< Updated upstream
+=======
+   game_stage.addChild( enemy3.state );
+	game_stage.addChild( enemy4.state );
+   game_stage.addChild( enemy5.state );
+	game_stage.addChild( enemy6.state );
+   game_stage.addChild( enemy7.state );
+   game_stage.addChild( enemy8.state );
+	game_stage.addChild( enemy9.state );
+   game_stage.addChild( enemy10.state );
+   game_stage.addChild( enemy11.state );
+   
+>>>>>>> Stashed changes
 	document.addEventListener('keydown', keydownEventHandler);
 	
 	master_stage.addChild(game_stage);
@@ -872,6 +1000,220 @@ function teleportPlayer( teleportIndex )
 }
 
 
+<<<<<<< Updated upstream
+=======
+/**
+	Builds the different screens of the game
+*/
+function buildScreens() {
+   startScreen.visible = true;
+   instructScreen.visible = false;
+   creditScreen.visible = false;
+   winScreen.visible = false;
+   loseScreen.visible = false;
+   statsScreen.visible = false;
+
+    // Text for titles
+   var gameStatsText = new PIXI.Text( "Stats", {fill : 0x000000} );
+   var playerAttackText = new PIXI.Text( "Attack:" , {fill : 0xFFFFFF} );
+   var playerHealthText = new PIXI.Text( "Health:", {fill : 0xFFFFFF} );
+   var playerArmorText = new PIXI.Text( "Armor:", {fill : 0xFFFFFF} );
+   var gameTitleText = new PIXI.Text( "RPG!", {fill : 0xFFFFFF} );
+   var gameInstructTitleText = new PIXI.Text( "Instructions", {fill : 0xFFFFFF} );
+   var gameCreditTitleText = new PIXI.Text( "Credits", {fill : 0xFFFFFF} );
+   var gameWinText = new PIXI.Text( "Game over!\nYou win!", {fill : 0xFFFFFF} );
+   var gameLoseText = new PIXI.Text("Game over!\nThe Shadow King has conquered Terra.", {fill : 0xFFFFFF} );
+
+   // Text for title screen options
+   var gameStartText = new PIXI.Text( "Start", {fill : 0xFFFFFF} );
+   var gameInstructText = new PIXI.Text( "Instructions", {fill : 0xFFFFFF} );
+   var gameCredText = new PIXI.Text( "Credits", {fill : 0xFFFFFF} );  
+   var gameCredBackText = new PIXI.Text( "<- Back", {fill : 0xFFFFFF} );
+   var gameStatsBackText = new PIXI.Text( "Back", {fill : 0xFFFFFF} );
+   var gameInstructBackText = new PIXI.Text( "<- Back", {fill : 0xFFFFFF} );
+   var gameRestartText = new PIXI.Text( "Play again", {fill : 0xFFFFFF} );
+   var gameReturnTitleText = new PIXI.Text( "Back to title screen", {fill : 0xFFFFFF} );
+   var gameLoseRestartText = new PIXI.Text( "Play again", {fill : 0xFFFFFF} );
+   var gameLoseReturnTitleText = new PIXI.Text( "Back to title screen", {fill : 0xFFFFFF} );
+
+   
+   // Adds regular text -----------------------------------------------------
+   var gameInstructDesc = new PIXI.Text( "The hero must defeated the Shadow\n" + 
+                                         "King and save the world! Use WASD\n" + 
+                                         "to navigate the world. Talk to as\n" +
+                                         "many people as you can in order to\n" + 
+                                         "gather as much info as possible!\n\n" + 
+                                         "Some townsfolk can even help you\n" + 
+                                         "by making you stronger!", {fill : 0xFFFFFF} );
+   var gameCredDesc = new PIXI.Text( "Authors: \nJohn Jacobelli\nJesse Rodriguez\nTyler "+
+                                     "Pehringer\n\nRenderer used: PixiJS", {fill : 0xFFFFFF} );
+
+   // Declare texts interactable
+   gameStatsText.interactive = true;
+   gameStatsBackText.interactive = true;
+   gameStartText.interactive = true;
+   gameInstructText.interactive = true;
+   gameCredText.interactive = true;
+   gameCredBackText.interactive = true;
+   gameInstructBackText.interactive = true;
+   gameRestartText.interactive = true;
+   gameReturnTitleText.interactive = true;
+   gameLoseRestartText.interactive = true;
+   gameLoseReturnTitleText.interactive = true;
+
+   
+   // Declares interactable text functions
+   gameStatsText.click = function(event) { statsScreen.visible = true;
+                                           playerAttackText.setText( "Attack: " + player_attack );
+                                           currentHealthSprite = createSprite( 103, 437, 1, 1, "ex_meter" + 
+                                                                  player_health + ".png" );
+                                           statsScreen.addChild( currentHealthSprite );
+                                           
+                                           currentArmorSprite = createSprite( 103, 470, 1, 1, "armor" + 
+                                                                  player_armor + ".png" );
+                                           statsScreen.addChild( currentArmorSprite );
+                                           
+                                           }
+   
+   gameStatsBackText.click = function(event) { statsScreen.visible = false; 
+                                               statsScreen.removeChild( currentHealthSprite );
+                                               statsScreen.removeChild( currentArmorSprite );
+                                           }
+                                           
+   gameStartText.click = function(event) { startScreen.visible = false; 
+                                           game_stage.visible = true;
+                                           gameStatsText.visible = true; }
+                                           
+   gameInstructText.click = function(event) { instructScreen.visible = true;
+                                              startScreen.visible = false; }
+                                              
+   gameCredText.click = function(event) { creditScreen.visible = true;
+                                          startScreen.visible = false; }
+                                          
+   gameCredBackText.click = function(event) { startScreen.visible = true;
+                                              creditScreen.visible = false; }
+                                              
+   gameInstructBackText.click = function(event) { startScreen.visible = true;
+                                                  instructScreen.visible = false; }
+                                                  
+   gameRestartText.click = function(event) { winScreen.visible = false;
+                                             loseScreen.visible = false; }
+                                             
+   gameReturnTitleText.click = function(event) { startScreen.visible = true;
+                                                 winScreen.visible = false;
+                                                 loseScreen.visible = false; }
+                                                 
+   gameLoseRestartText.click = function(event) { winScreen.visible = false;
+                                                 loseScreen.visible = false; }
+                                             
+   gameLoseReturnTitleText.click = function(event) { startScreen.visible = true;
+                                                     winScreen.visible = false;
+                                                     loseScreen.visible = false;  }
+    
+   
+   // Create background for screens screen
+   var graphics1 = createShape();
+   var graphics2 = createShape();
+   var graphics3 = createShape();
+   var graphics4 = createShape();
+   var graphics5 = createShape();
+   var graphics6 = new PIXI.Graphics();
+   graphics6.beginFill('0x000000');
+   graphics6.drawRect(0, 400, 500, 100);
+   graphics6.endFill();
+   
+   startScreen.addChild( graphics1 );
+   instructScreen.addChild( graphics2 );
+   creditScreen.addChild( graphics3 );
+   winScreen.addChild( graphics4 );
+   loseScreen.addChild( graphics5 );
+   statsScreen.addChild( graphics6 );
+
+   // Add text to screens
+   startScreen.addChild( gameTitleText );
+   startScreen.addChild( gameStartText );
+   startScreen.addChild( gameInstructText );
+   startScreen.addChild( gameCredText );
+   instructScreen.addChild( gameInstructTitleText );
+   instructScreen.addChild( gameInstructDesc );
+   instructScreen.addChild( gameInstructBackText );
+   creditScreen.addChild( gameCredBackText );
+   creditScreen.addChild( gameCreditTitleText );
+   creditScreen.addChild( gameCredDesc );
+   winScreen.addChild( gameWinText );
+   winScreen.addChild( gameRestartText );
+   winScreen.addChild( gameReturnTitleText );
+   loseScreen.addChild( gameLoseText );
+   loseScreen.addChild( gameLoseRestartText );
+   loseScreen.addChild( gameLoseReturnTitleText );
+   statsScreen.addChild( gameStatsBackText );
+   statsScreen.addChild( playerAttackText );
+   statsScreen.addChild( playerHealthText );
+   statsScreen.addChild( playerArmorText );
+   master_stage.addChild( gameStatsText );
+   
+   // Set anchors for text
+   gameStatsText.anchor.set( 1 );
+   gameStatsBackText.anchor.set( 1 );
+   gameTitleText.anchor.set( .5 );
+   gameStartText.anchor.set( .5 );
+   gameInstructText.anchor.set( .5 );
+   gameCredText.anchor.set( .5 );
+   gameInstructTitleText.anchor.set( .5 );
+   gameInstructBackText.anchor.set( 1 );
+   gameCredBackText.anchor.set( 1 );
+   gameCreditTitleText.anchor.set( .5 );
+   gameWinText.anchor.set( .5 );
+   gameRestartText.anchor.set( .5 );
+   gameReturnTitleText.anchor.set( .5 );
+   gameLoseRestartText.anchor.set( .5 );
+   gameLoseReturnTitleText.anchor.set( .5 );
+
+   // Place Text
+   gameStatsText.x = GAME_WIDTH - 15; gameStatsText.y = GAME_HEIGHT - 15;
+   gameStatsBackText.x = GAME_WIDTH - 15; gameStatsBackText.y = GAME_HEIGHT - 15;
+   playerAttackText.x = 5; playerAttackText.y = 405;
+   playerHealthText.x = 5; playerHealthText.y = 435;
+   playerArmorText.x = 5; playerArmorText.y = 465;
+   gameTitleText.x = GAME_WIDTH/2; gameTitleText.y = GAME_HEIGHT/4;
+   gameStartText.x = GAME_WIDTH/6; gameStartText.y = GAME_HEIGHT/4 * 3;
+   gameInstructText.x = GAME_WIDTH/2 ; gameInstructText.y = GAME_HEIGHT/4 * 3;
+   gameCredText.x = GAME_WIDTH/6 * 5; gameCredText.y = GAME_HEIGHT/4 * 3;
+   gameInstructTitleText.x = GAME_WIDTH/2; gameInstructTitleText.y = GAME_HEIGHT/4;
+   gameInstructDesc.x = 25; gameInstructDesc.y = GAME_HEIGHT * 1.5 /4;
+   gameCreditTitleText.x = GAME_WIDTH/2; gameCreditTitleText.y = GAME_HEIGHT/4;
+   gameCredDesc.x = 25; gameCredDesc.y = GAME_HEIGHT/2;
+   gameInstructBackText.x = GAME_WIDTH - 25; gameInstructBackText.y = GAME_WIDTH - 25;
+   gameCredBackText.x = GAME_WIDTH - 25; gameCredBackText.y = GAME_WIDTH - 25;
+   gameWinText.x = GAME_WIDTH/2; gameWinText.y = GAME_HEIGHT/3 + 10;
+   gameLoseText.x = GAME_WIDTH/8; gameLoseText.y = GAME_HEIGHT/3 + 10;
+   gameRestartText.x = GAME_WIDTH/2; gameRestartText.y = GAME_HEIGHT/2 + 50;
+   gameReturnTitleText.x = GAME_WIDTH/2; gameReturnTitleText.y = GAME_HEIGHT/2 + 100;
+   gameLoseRestartText.x = GAME_WIDTH/2; gameLoseRestartText.y = GAME_HEIGHT/2 + 50;
+   gameLoseReturnTitleText.x = GAME_WIDTH/2; gameLoseReturnTitleText.y = GAME_HEIGHT/2 + 100;
+   
+   // Add screens to stage
+   master_stage.addChild( startScreen );
+   master_stage.addChild( instructScreen );
+   master_stage.addChild( creditScreen );
+   master_stage.addChild( winScreen );
+   master_stage.addChild( loseScreen );
+   master_stage.addChild( statsScreen );
+}
+
+
+/**
+*/
+function createShape() {
+   var graphics = new PIXI.Graphics();
+   graphics.beginFill('0x000000');
+   graphics.drawRect(0, 0, 500, 500);
+   graphics.endFill();
+   return graphics;
+}
+
+
+>>>>>>> Stashed changes
 function checkTarget(){
 
 	for(var i in enemies){
