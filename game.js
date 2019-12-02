@@ -43,6 +43,14 @@ var battle_y;
 var temp_x;
 var temp_y;
 var temp_direction;
+var player_health = 10;
+var player_attack = 99;
+var health_meter;
+var player_alive = true;
+var player_boost = false;
+var player_armor = 1;
+var player_max_armor = 1;
+var player_speed = 5;
 var enemy;
 var danger_level;
 var current_enemy;
@@ -129,9 +137,14 @@ function generateLevel()
 	collidableArray = world.getObject("Collidable").data;
     teleportArray = world.getObject("Teleport").data;
     npcArray = world.getObject("NPC").data;
-	
 	player = new Player();
 	game_stage.addChild( player.state );
+	//player = createMovieClip( PLAYER_START_X, PLAYER_START_Y, 1, 1, "PlayerRight", 1, 3 );
+	//playerDirection = RIGHT;
+	player_name = "Hero"; //Replace with user input
+   //player.anchor.x = .5;
+	//player.anchor.y = .5;
+	game_stage.addChild( player );
 	
 	enemy = new Enemy({id: OGRE,
 						num_charges: 3,
@@ -299,8 +312,8 @@ function generateLevel()
 	enemies.push( enemy7 );
 	enemies.push( enemy8 );
 	enemies.push( enemy9 );
-	enemies.push( enemy10 );
-	enemies.push( enemy11 );
+   enemies.push( enemy10 );
+   enemies.push( enemy11 );
    
    initialize_npc_dialogue();
 	
@@ -802,6 +815,7 @@ function getCurrentLine()
          {
             currentArray = npc12112_dialogue;
             player.attack++;
+			//player_attack++;
             npc12112_talked_to = true;
          }
          
@@ -833,6 +847,8 @@ function getCurrentLine()
          currentArray = npc33121_dialogue;
          player.armor = player.max_armor;
          player.health = 10;
+         //player_armor = player_max_armor;
+         //player_health = 10;
          break;
       case 34107:
          currentArray = npc34107_dialogue;
@@ -849,6 +865,8 @@ function getCurrentLine()
             currentArray = npc40121_dialogue;
             player.armor++;
             player.max_armor++;
+           // player_armor++;
+           // player_max_armor++;
             npc40121_talked_to = true;
          }
          
@@ -901,7 +919,6 @@ function initialize_npc_dialogue()
                             "my generosity even more? Greedy lil\n"+
                             "bugger...");
    
-   // Needs enter when longer than --------------------------------
    npc4114_dialogue.push( "I am a town guard, I help keep this\n"+
                           "place safe!" );
    
@@ -1385,6 +1402,7 @@ function enemyAttack( foe ) {
 				player_alive = false;
 				endBattle( foe );
 			}
+			
          player.armor--;
 		}
 	}
