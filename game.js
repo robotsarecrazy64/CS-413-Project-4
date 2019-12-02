@@ -25,6 +25,13 @@ var battle_text_stage = new PIXI.Container();
 var threat_stage = new PIXI.Container();
 var player_threat_stage = new PIXI.Container();
 var game_stage = new PIXI.Container();
+var startScreen = new PIXI.Container();
+var instructScreen = new PIXI.Container();
+var creditScreen = new PIXI.Container();
+var winScreen = new PIXI.Container();
+var loseScreen = new PIXI.Container();
+var back = new PIXI.Container();
+var statsScreen = new PIXI.Container();
 game_stage.scale.x = GAME_SCALE;
 game_stage.scale.y = GAME_SCALE;
 
@@ -43,7 +50,8 @@ var player_attack = 99;
 var health_meter;
 var player_alive = true;
 var player_boost = false;
-var player_armor = 10;
+var player_armor = 1;
+var player_max_armor = 1;
 var player_speed = 5;
 var enemy;
 var danger_level;
@@ -75,6 +83,10 @@ var npc34107_dialogue = [];
 var npc43107_dialogue = [];
 var npc4123_dialogue = [];
 var npc40121_dialogue = [];
+var npc40121X_dialogue = [];
+var npc12112X_dialogue = [];
+var npc40121_talked_to = false;
+var npc12112_talked_to = false;
 var currentDialogue = 0;
 var currentLine;
 var currentNPC = 0;
@@ -83,6 +95,8 @@ var dialogueBox;
 var dialogueText;
 
 const PLAYERMOVEAMOUNT = 25;
+const PLAYER_START_X = PLAYERMOVEAMOUNT * 2;
+const PLAYER_START_Y = PLAYERMOVEAMOUNT * 106;
 const FIGHT = 100;
 const STEAL = 200;
 const ITEM = 300;
@@ -120,7 +134,7 @@ function generateLevel()
     teleportArray = world.getObject("Teleport").data;
     npcArray = world.getObject("NPC").data;
 	
-	player = createMovieClip( PLAYERMOVEAMOUNT * 2, PLAYERMOVEAMOUNT * 106, 1, 1, "PlayerRight", 1, 3 );
+	player = createMovieClip( PLAYER_START_X, PLAYER_START_Y, 1, 1, "PlayerRight", 1, 3 );
 	playerDirection = RIGHT;
 	player_name = "Hero"; //Replace with user input
    //player.anchor.x = .5;
@@ -171,9 +185,10 @@ function generateLevel()
 						speed: 5});*/
 	enemy2 = new Enemy({id: EVIL_TREE,
 						num_charges: 5,
-						x: 700, 
-						y: 600, 
-						state: createMovieClip( 700, 500, 1, 1, "Overworld_Evil Tree", 1, 3 ), 
+						x: PLAYERMOVEAMOUNT * 43, 
+						y: PLAYERMOVEAMOUNT * 43, 
+						state: createMovieClip( PLAYERMOVEAMOUNT * 43, PLAYERMOVEAMOUNT * 43, 
+                                          1, 1, "Overworld_Evil Tree", 1, 3 ), 
 						name: "Evil Tree", 
 						attack: 4, 
 						speed: 8});
@@ -181,13 +196,16 @@ function generateLevel()
 	enemies.push( enemy );
 	enemies.push( enemy2 );
    
-    initialize_npc_dialogue();
+   initialize_npc_dialogue();
 	
 	game_stage.addChild( enemy.state );
 	game_stage.addChild( enemy2.state );
 	document.addEventListener('keydown', keydownEventHandler);
 	
 	master_stage.addChild(game_stage);
+   buildScreens();
+   
+   game_stage.visible = false;
 	
 	update();
 }
@@ -286,7 +304,6 @@ function generateBattleMenu()
 
 function update() 
 {
-	
 	requestAnimationFrame( update );
 	update_camera();
 	if ( battle_active ) { 
@@ -411,8 +428,16 @@ var menu = StateMachine.create({
 
 // ---------- Input handlers
 function keydownEventHandler(event) {
-   if ( player_alive ) {
-      if ( !battle_active && !dialogue_active ) {
+   if( !game_stage.visible )
+   {
+      player.x = PLAYER_START_X;
+      player.y = PLAYER_START_Y;
+   }
+   
+   else if ( player_alive ) 
+   {
+      if ( !battle_active && !dialogue_active ) 
+      {
       
          // Vertical --------------------------------------------------
          if ( event.keyCode == WKEY )
@@ -663,7 +688,18 @@ function getCurrentLine()
    switch( currentNPC )
    {
       case 12112:
-         currentArray = npc12112_dialogue;
+         if( !npc12112_talked_to )
+         {
+            currentArray = npc12112_dialogue;
+            player_attack++;
+            npc12112_talked_to = true;
+         }
+         
+         else
+         {
+            currentArray = npc12112X_dialogue;
+         }
+         
          break;
       case 4114:
          currentArray = npc4114_dialogue;
@@ -685,6 +721,8 @@ function getCurrentLine()
          break;
       case 33121:
          currentArray = npc33121_dialogue;
+         player_armor = player_max_armor;
+         player_health = 10;
          break;
       case 34107:
          currentArray = npc34107_dialogue;
@@ -696,7 +734,19 @@ function getCurrentLine()
          currentArray = npc4123_dialogue;
          break;
       case 40121:
-         currentArray = npc40121_dialogue;
+         if( !npc40121_talked_to )
+         {
+            currentArray = npc40121_dialogue;
+            player_armor++;
+            player_max_armor++;
+            npc40121_talked_to = true;
+         }
+         
+         else
+         {
+            currentArray = npc40121X_dialogue;
+         }
+         
          break;  
    }
 }
@@ -726,11 +776,26 @@ function initialize_npc_dialogue()
    npc12112_dialogue.push( "I'm the town's blacksmith, but I\n"+
                            "graduated with a degree in literature..." );
    npc12112_dialogue.push( "I've honed my craft over the years\n"+
-                           "though!" );
+                           "though! Here, let me teach you a thing\n" +
+                           "or two...");
+   npc12112_dialogue.push( "Your attack increased!" );
+   npc12112_dialogue.push( "Also, 1 armor equal 10 health! So if\n"+
+                           "you have 2 armor, you have 20 total\n" +
+                           "health. But beware! You cannot restore");
+   npc12112_dialogue.push( "armor in combat, only health. Find\n"+
+                           "someone in a town who can restore it\n" +
+                           "for you.");
    
+   // Needs enter when longer than --------------------------------
+   npc12112X_dialogue.push( "Sheesh, trying to take advantage of\n" +
+                            "my generosity even more? Greedy lil\n"+
+                            "bugger...");
+   
+   // Needs enter when longer than --------------------------------
    npc4114_dialogue.push( "I am a town guard, I help keep this\n"+
                           "place safe!" );
    
+   // Needs enter when longer than --------------------------------
    npc17113_dialogue.push( "Oh someone help us! There is a great\n"+
                            "evil that wishes to destory us all!\n" );
    npc17113_dialogue.push( "You there, please help! There is a\n"+
@@ -742,53 +807,81 @@ function initialize_npc_dialogue()
    npc17113_dialogue.push( "You would be hailed a hero if she were\n"+
                            "slain by your hand!" );
    
+   // Needs enter when longer than --------------------------------
    npc22117_dialogue.push( "If I jump into the pond and swam\n"+
                            "far away, would anyone chase after\n" +
                            "me?" );
    
+   // Needs enter when longer than --------------------------------
    npc20110_dialogue.push( "I love looking in the water and seeing\n"+
                            "my reflection looking back!" );
    npc20110_dialogue.push( "It's kinda creepy when she smiles back\n"+
                            "and I'm not...");
    
+   // Needs enter when longer than --------------------------------
    npc27110_dialogue.push( "My wife accused me of sneaking off to\n"+
                            "try and slay the monster!" );
    npc27110_dialogue.push( "All I was trying to do was surprise\n"+
                            "her with flowers..." );
-  
+   
+   // Needs enter when longer than --------------------------------
    npc27123_dialogue.push( "I am unsure how I am able to walk on\n"+
                            "water..." );
    npc27123_dialogue.push( "This is a precarious situation. \n"+
                            "One second me and Billy were\n" +
                            "walking around the pond. I tried\n" );
    npc27123_dialogue.push( "to splash him by jumping.\n"  +
-                           "Low and behold the water did not \n" );
-   npc27123_dialogue.push( "move. I ventured slightly further\n" +
-                           "and ended up here.\n" +
-                           "Where did Billy dash off to though?\n" );
-   npc27123_dialogue.push( "In my glee of waterwalking, he\n" +
-                           "vanished... I hope the monster did\n" +
-                           "not get him!" );
-   npc27123_dialogue.push( "I must go, if the others see this\n"+
-                           "I may be tried for witchcraft.\n" +
+                           "Low and behold the water did not \n" +
+                           "move. I ventured slightly further\n" );
+   npc27123_dialogue.push( "and ended up here.\n" +
+                           "Where did Billy dash off to though?\n" +
+                           "In my glee of waterwalking, he\n" );
+   npc27123_dialogue.push( "vanished... I hope a monster did\n" +
+                           "not get him!\n" +
+                           "I must go, if the others see this\n");
+   npc27123_dialogue.push( "I may be tried for witchcraft.\n" +
                            "They cannot comprehend my gift. \n" );
    
-   npc33121_dialogue.push( "hey6" );
+   // Needs enter when longer than --------------------------------
+   npc33121_dialogue.push( "You look injured! Let me patch you\n" +
+                           "up!");
+   npc33121_dialogue.push( "Your health and armor has been \n"+
+                           "restored!" );
    
+   // Needs enter when longer than --------------------------------
    npc34107_dialogue.push( "Hello citizen, have no fear, Town\n" +
                            "Guard is here! Oh, you are going\n" +
                            "to be a hero and slay the monster?" );
    npc34107_dialogue.push( "Right... good luck with that." );
    
-   npc43107_dialogue.push( "I'll say nice things at the\n" +
-                           "funeral. It's too dangerous for\n"+
-                           "anyone to survive out there." );
+   // Needs enter when longer than --------------------------------
+   npc43107_dialogue.push( "Hey I recognize that sword! It's the \n" +
+                           "hero sword right? The one that gets\n"+
+                           "stronger the more monsters you kill?" );
+   npc43107_dialogue.push( "You best be careful out there, the King\n" +
+                           "is absorbing monsters to power up...\n"+
+                           "If you flee from a monster, it will get" );
+   npc43107_dialogue.push( "absorbed by the Shadow King to \n" +
+                           "power his world ending attack! Better \n"+
+                           "kill them while you have the chance." );
+   npc43107_dialogue.push( "I'll say nice things at your funeral.\n" +
+                           "It's too dangerous for anyone to \n"+
+                           "survive out there." );
    
+   // Needs enter when longer than --------------------------------
    npc4123_dialogue.push( "Oh my, a dashing young hero to save\n" +
                           "us all! Thank you youngster. Now I\n"+
                           "can tend to my crops again." );
    
-   npc40121_dialogue.push( "hey0" );   
+   // Needs enter when longer than --------------------------------
+   npc40121_dialogue.push( "I wish I could still adventure like\n"+
+                           "you! You inspire me, please take my\n" +
+                           "knowledge of defense!" );
+   npc40121_dialogue.push( "Your armor has increased!" );
+   
+   // Needs enter when longer than --------------------------------
+   npc40121X_dialogue.push( "You've already taken my knowledge...\n" + 
+                            "What more do you want of me!?" ); 
    
 }
 
@@ -869,6 +962,213 @@ function teleportPlayer( teleportIndex )
          playerDirection = DOWN;
          break;
    }
+}
+
+
+/**
+	Builds the different screens of the game
+*/
+function buildScreens() {
+   startScreen.visible = true;
+   instructScreen.visible = false;
+   creditScreen.visible = false;
+   winScreen.visible = false;
+   loseScreen.visible = false;
+   statsScreen.visible = false;
+
+    // Text for titles
+   var gameStatsText = new PIXI.Text( "Stats", {fill : 0x000000} );
+   var playerAttackText = new PIXI.Text( "Attack:", {fill : 0xFFFFFF} );
+   var playerHealthText = new PIXI.Text( "Health:", {fill : 0xFFFFFF} );
+   var playerArmorText = new PIXI.Text( "Armor:", {fill : 0xFFFFFF} );
+   var gameTitleText = new PIXI.Text( "RPG!", {fill : 0xFFFFFF} );
+   var gameInstructTitleText = new PIXI.Text( "Instructions", {fill : 0xFFFFFF} );
+   var gameCreditTitleText = new PIXI.Text( "Credits", {fill : 0xFFFFFF} );
+   var gameWinText = new PIXI.Text( "Game over!\nYou win!", {fill : 0xFFFFFF} );
+   var gameLoseText = new PIXI.Text("Game over!\nThe Shadow King has conquered Terra.", {fill : 0xFFFFFF} );
+
+   // Text for title screen options
+   var gameStartText = new PIXI.Text( "Start", {fill : 0xFFFFFF} );
+   var gameInstructText = new PIXI.Text( "Instructions", {fill : 0xFFFFFF} );
+   var gameCredText = new PIXI.Text( "Credits", {fill : 0xFFFFFF} );  
+   var gameCredBackText = new PIXI.Text( "<- Back", {fill : 0xFFFFFF} );
+   var gameStatsBackText = new PIXI.Text( "Back", {fill : 0xFFFFFF} );
+   var gameInstructBackText = new PIXI.Text( "<- Back", {fill : 0xFFFFFF} );
+   var gameRestartText = new PIXI.Text( "Play again", {fill : 0xFFFFFF} );
+   var gameReturnTitleText = new PIXI.Text( "Back to title screen", {fill : 0xFFFFFF} );
+   var gameLoseRestartText = new PIXI.Text( "Play again", {fill : 0xFFFFFF} );
+   var gameLoseReturnTitleText = new PIXI.Text( "Back to title screen", {fill : 0xFFFFFF} );
+
+   
+   // Adds regular text -----------------------------------------------------
+   var gameInstructDesc = new PIXI.Text( "The hero must defeated the Shadow\n" + 
+                                         "King and save the world! Use WASD\n" + 
+                                         "to navigate the world. Talk to as\n" +
+                                         "many people as you can in order to\n" + 
+                                         "gather as much info as possible!\n\n" + 
+                                         "Some townsfolk can even help you\n" + 
+                                         "by making you stronger!", {fill : 0xFFFFFF} );
+   var gameCredDesc = new PIXI.Text( "Authors: \nJohn Jacobelli\nJesse Rodriguez\nTyler "+
+                                     "Pehringer\n\nRenderer used: PixiJS", {fill : 0xFFFFFF} );
+
+   // Declare texts interactable
+   gameStatsText.interactive = true;
+   gameStatsBackText.interactive = true;
+   gameStartText.interactive = true;
+   gameInstructText.interactive = true;
+   gameCredText.interactive = true;
+   gameCredBackText.interactive = true;
+   gameInstructBackText.interactive = true;
+   gameRestartText.interactive = true;
+   gameReturnTitleText.interactive = true;
+   gameLoseRestartText.interactive = true;
+   gameLoseReturnTitleText.interactive = true;
+
+   
+   // Declares interactable text functions
+   gameStatsText.click = function(event) { statsScreen.visible = true;
+                                           updateStats(); }
+   
+   gameStatsBackText.click = function(event) { statsScreen.visible = false; }
+                                           
+   gameStartText.click = function(event) { startScreen.visible = false; 
+                                           game_stage.visible = true;
+                                           gameStatsText.visible = true; }
+                                           
+   gameInstructText.click = function(event) { instructScreen.visible = true;
+                                              startScreen.visible = false; }
+                                              
+   gameCredText.click = function(event) { creditScreen.visible = true;
+                                          startScreen.visible = false; }
+                                          
+   gameCredBackText.click = function(event) { startScreen.visible = true;
+                                              creditScreen.visible = false; }
+                                              
+   gameInstructBackText.click = function(event) { startScreen.visible = true;
+                                                  instructScreen.visible = false; }
+                                                  
+   gameRestartText.click = function(event) { winScreen.visible = false;
+                                             loseScreen.visible = false; }
+                                             
+   gameReturnTitleText.click = function(event) { startScreen.visible = true;
+                                                 winScreen.visible = false;
+                                                 loseScreen.visible = false; }
+                                                 
+   gameLoseRestartText.click = function(event) { winScreen.visible = false;
+                                                 loseScreen.visible = false; }
+                                             
+   gameLoseReturnTitleText.click = function(event) { startScreen.visible = true;
+                                                     winScreen.visible = false;
+                                                     loseScreen.visible = false;  }
+    
+   
+   // Create background for screens screen
+   var graphics1 = createShape();
+   var graphics2 = createShape();
+   var graphics3 = createShape();
+   var graphics4 = createShape();
+   var graphics5 = createShape();
+   var graphics6 = new PIXI.Graphics();
+   graphics6.beginFill('0x000000');
+   graphics6.drawRect(0, 400, 500, 100);
+   graphics6.endFill();
+   
+   startScreen.addChild( graphics1 );
+   instructScreen.addChild( graphics2 );
+   creditScreen.addChild( graphics3 );
+   winScreen.addChild( graphics4 );
+   loseScreen.addChild( graphics5 );
+   statsScreen.addChild( graphics6 );
+
+   // Add text to screens
+   startScreen.addChild( gameTitleText );
+   startScreen.addChild( gameStartText );
+   startScreen.addChild( gameInstructText );
+   startScreen.addChild( gameCredText );
+   instructScreen.addChild( gameInstructTitleText );
+   instructScreen.addChild( gameInstructDesc );
+   instructScreen.addChild( gameInstructBackText );
+   creditScreen.addChild( gameCredBackText );
+   creditScreen.addChild( gameCreditTitleText );
+   creditScreen.addChild( gameCredDesc );
+   winScreen.addChild( gameWinText );
+   winScreen.addChild( gameRestartText );
+   winScreen.addChild( gameReturnTitleText );
+   loseScreen.addChild( gameLoseText );
+   loseScreen.addChild( gameLoseRestartText );
+   loseScreen.addChild( gameLoseReturnTitleText );
+   statsScreen.addChild( gameStatsBackText );
+   statsScreen.addChild( playerAttackText );
+   statsScreen.addChild( playerHealthText );
+   statsScreen.addChild( playerArmorText );
+   master_stage.addChild( gameStatsText );
+   
+   // Set anchors for text
+   gameStatsText.anchor.set( 1 );
+   gameStatsBackText.anchor.set( 1 );
+   gameTitleText.anchor.set( .5 );
+   gameStartText.anchor.set( .5 );
+   gameInstructText.anchor.set( .5 );
+   gameCredText.anchor.set( .5 );
+   gameInstructTitleText.anchor.set( .5 );
+   gameInstructBackText.anchor.set( 1 );
+   gameCredBackText.anchor.set( 1 );
+   gameCreditTitleText.anchor.set( .5 );
+   gameWinText.anchor.set( .5 );
+   gameRestartText.anchor.set( .5 );
+   gameReturnTitleText.anchor.set( .5 );
+   gameLoseRestartText.anchor.set( .5 );
+   gameLoseReturnTitleText.anchor.set( .5 );
+
+   // Place Text
+   gameStatsText.x = GAME_WIDTH - 15; gameStatsText.y = GAME_HEIGHT - 15;
+   gameStatsBackText.x = GAME_WIDTH - 15; gameStatsBackText.y = GAME_HEIGHT - 15;
+   playerAttackText.x = 5; playerAttackText.y = 405;
+   playerHealthText.x = 5; playerHealthText.y = 435;
+   playerArmorText.x = 5; playerArmorText.y = 465;
+   gameTitleText.x = GAME_WIDTH/2; gameTitleText.y = GAME_HEIGHT/4;
+   gameStartText.x = GAME_WIDTH/6; gameStartText.y = GAME_HEIGHT/4 * 3;
+   gameInstructText.x = GAME_WIDTH/2 ; gameInstructText.y = GAME_HEIGHT/4 * 3;
+   gameCredText.x = GAME_WIDTH/6 * 5; gameCredText.y = GAME_HEIGHT/4 * 3;
+   gameInstructTitleText.x = GAME_WIDTH/2; gameInstructTitleText.y = GAME_HEIGHT/4;
+   gameInstructDesc.x = 25; gameInstructDesc.y = GAME_HEIGHT * 1.5 /4;
+   gameCreditTitleText.x = GAME_WIDTH/2; gameCreditTitleText.y = GAME_HEIGHT/4;
+   gameCredDesc.x = 25; gameCredDesc.y = GAME_HEIGHT/2;
+   gameInstructBackText.x = GAME_WIDTH - 25; gameInstructBackText.y = GAME_WIDTH - 25;
+   gameCredBackText.x = GAME_WIDTH - 25; gameCredBackText.y = GAME_WIDTH - 25;
+   gameWinText.x = GAME_WIDTH/2; gameWinText.y = GAME_HEIGHT/3 + 10;
+   gameLoseText.x = GAME_WIDTH/8; gameLoseText.y = GAME_HEIGHT/3 + 10;
+   gameRestartText.x = GAME_WIDTH/2; gameRestartText.y = GAME_HEIGHT/2 + 50;
+   gameReturnTitleText.x = GAME_WIDTH/2; gameReturnTitleText.y = GAME_HEIGHT/2 + 100;
+   gameLoseRestartText.x = GAME_WIDTH/2; gameLoseRestartText.y = GAME_HEIGHT/2 + 50;
+   gameLoseReturnTitleText.x = GAME_WIDTH/2; gameLoseReturnTitleText.y = GAME_HEIGHT/2 + 100;
+   
+   // Add screens to stage
+   master_stage.addChild( startScreen );
+   master_stage.addChild( instructScreen );
+   master_stage.addChild( creditScreen );
+   master_stage.addChild( winScreen );
+   master_stage.addChild( loseScreen );
+   master_stage.addChild( statsScreen );
+}
+
+
+/**
+*/
+function createShape() {
+   var graphics = new PIXI.Graphics();
+   graphics.beginFill('0x000000');
+   graphics.drawRect(0, 0, 500, 500);
+   graphics.endFill();
+   return graphics;
+}
+
+
+function updateStats()
+{
+   playerAttackText.Text( "Attack: " + "5" );
+   playerHealthText.setText( "Attack: " + player_health );
+   playerArmorText.setText( "Attack: " + player_armor );
 }
 
 
@@ -971,6 +1271,7 @@ function enemyAttack( foe ) {
 				player_alive = false;
 				endBattle( foe );
 			}
+         player_armor--;
 		}
 	}
 }
