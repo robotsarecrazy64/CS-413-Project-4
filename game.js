@@ -28,8 +28,8 @@ var game_stage = new PIXI.Container();
 var startScreen = new PIXI.Container();
 var instructScreen = new PIXI.Container();
 var creditScreen = new PIXI.Container();
-var winScreen = new PIXI.Container();
-var loseScreen = new PIXI.Container();
+var gameLoseScreen = new PIXI.Container();
+var gameWinScreen = new PIXI.Container();
 var back = new PIXI.Container();
 var statsScreen = new PIXI.Container();
 game_stage.scale.x = GAME_SCALE;
@@ -94,6 +94,7 @@ var playerArmorText;
 var playerArmorArray = [];
 var currentHealthSprite;
 var currentArmorSprite;
+var gameWin = false;
 
 const PLAYERMOVEAMOUNT = 25;
 const PLAYER_START_X = PLAYERMOVEAMOUNT * 2;
@@ -244,9 +245,9 @@ function generateLevel()
    
    enemy6 = new Enemy({id: SHADOW_KING,
 						num_charges: 8,
-						x: PLAYERMOVEAMOUNT * 16, 
-						y: PLAYERMOVEAMOUNT * 24,
-						state: createMovieClip( PLAYERMOVEAMOUNT * 16, PLAYERMOVEAMOUNT * 20,
+						x: PLAYERMOVEAMOUNT * 0, 
+						y: PLAYERMOVEAMOUNT * 0,
+						state: createMovieClip( PLAYERMOVEAMOUNT * 0, PLAYERMOVEAMOUNT * 0,
                                           1, 1, "Overworld_Shadow_King", 1, 5 ), 
 						name: "Shadow King", 
 						attack: 1, 
@@ -254,9 +255,9 @@ function generateLevel()
                   
    enemy7 = new Enemy({id: SEXY_HENCHMAN,
 						num_charges: 9,
-						x: PLAYERMOVEAMOUNT * 28, 
-						y: PLAYERMOVEAMOUNT * 39,
-                  state: createMovieClip( PLAYERMOVEAMOUNT * 28, PLAYERMOVEAMOUNT * 39,
+						x: PLAYERMOVEAMOUNT * 0, 
+						y: PLAYERMOVEAMOUNT * 0,
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 0, PLAYERMOVEAMOUNT * 0,
                                           1, 1, "Overworld_Sexy_Henchman", 1, 5 ), 
 						name: "Sexy Henchman", 
 						attack: 2, 
@@ -264,9 +265,9 @@ function generateLevel()
    
    enemy8 = new Enemy({id: DEMON_LEECH,
 						num_charges: 10,
-						x: PLAYERMOVEAMOUNT * 43, 
-						y: PLAYERMOVEAMOUNT * 29,
-                  state: createMovieClip( PLAYERMOVEAMOUNT * 43, PLAYERMOVEAMOUNT * 29,
+						x: PLAYERMOVEAMOUNT * 0, 
+						y: PLAYERMOVEAMOUNT * 0,
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 0, PLAYERMOVEAMOUNT * 0,
                                           1, 1, "Demon_Leech", 1, 3 ), 
 						name: "Demon_Leech", 
 						attack: 0, 
@@ -302,6 +303,17 @@ function generateLevel()
 						attack: 2, 
 						speed: 8});
    
+   enemy12 = new Enemy({id: PIXIE,
+						num_charges: 2,
+						x: PLAYERMOVEAMOUNT * 3, 
+						y: PLAYERMOVEAMOUNT * 109,
+                  state: createMovieClip( PLAYERMOVEAMOUNT * 3, PLAYERMOVEAMOUNT * 109,
+                                          1, 1, "Overworld_Pixie", 1, 3 ), 
+						name: "Pixie", 
+						attack: 2, 
+						speed: 8});
+   
+   
 		
 	enemies.push( enemy );
 	enemies.push( enemy2 );
@@ -314,6 +326,98 @@ function generateLevel()
 	enemies.push( enemy9 );
    enemies.push( enemy10 );
    enemies.push( enemy11 );
+   enemies.push( enemy12 );
+   
+   /** For later enemies
+   enemies.push( enemy13 );
+   enemies.push( enemy14 );
+   enemies.push( enemy15 );
+   enemies.push( enemy16 );
+   enemies.push( enemy17 );
+   enemies.push( enemy18 );
+   enemies.push( enemy19 );
+   enemies.push( enemy20 );
+   enemies.push( enemy21 );
+   enemies.push( enemy22 );
+   enemies.push( enemy23 );
+   enemies.push( enemy24 );
+   enemies.push( enemy25 );
+   enemies.push( enemy26 );
+   enemies.push( enemy27 );
+   enemies.push( enemy28 );
+   enemies.push( enemy29 );
+   enemies.push( enemy30 );
+   enemies.push( enemy31 );
+   enemies.push( enemy32 );
+   enemies.push( enemy33 );
+   enemies.push( enemy34 );
+   enemies.push( enemy35 );
+   enemies.push( enemy36 );
+   enemies.push( enemy37 );
+   enemies.push( enemy38 );
+   enemies.push( enemy39 );
+   enemies.push( enemy40 );
+   enemies.push( enemy41 );
+   enemies.push( enemy42 );
+   enemies.push( enemy43 );
+   enemies.push( enemy44 );
+   enemies.push( enemy45 );
+   enemies.push( enemy46 );
+   enemies.push( enemy47 );
+   enemies.push( enemy48 );
+   enemies.push( enemy49 );
+   enemies.push( enemy50 );
+   enemies.push( enemy51 );
+   enemies.push( enemy52 );
+   enemies.push( enemy53 );
+   enemies.push( enemy54 );
+   enemies.push( enemy55 );
+   enemies.push( enemy56 );
+   enemies.push( enemy57 );
+   enemies.push( enemy58 );
+   enemies.push( enemy59 );
+   enemies.push( enemy60 );
+   enemies.push( enemy61 );
+   enemies.push( enemy62 );
+   enemies.push( enemy63 );
+   enemies.push( enemy64 );
+   enemies.push( enemy65 );
+   enemies.push( enemy66 );
+   enemies.push( enemy67 );
+   enemies.push( enemy68 );
+   enemies.push( enemy69 );
+   enemies.push( enemy70 );
+   enemies.push( enemy71 );
+   enemies.push( enemy72 );
+   enemies.push( enemy73 );
+   enemies.push( enemy74 );
+   enemies.push( enemy75 );
+   enemies.push( enemy76 );
+   enemies.push( enemy77 );
+   enemies.push( enemy78 );
+   enemies.push( enemy79 );
+   enemies.push( enemy80 );
+   enemies.push( enemy81 );
+   enemies.push( enemy82 );
+   enemies.push( enemy83 );
+   enemies.push( enemy84 );
+   enemies.push( enemy85 );
+   enemies.push( enemy86 );
+   enemies.push( enemy87 );
+   enemies.push( enemy88 );
+   enemies.push( enemy89 );
+   enemies.push( enemy90 );
+   enemies.push( enemy91 );
+   enemies.push( enemy92 );
+   enemies.push( enemy93 );
+   enemies.push( enemy94 );
+   enemies.push( enemy95 );
+   enemies.push( enemy96 );
+   enemies.push( enemy97 );
+   enemies.push( enemy98 );
+   enemies.push( enemy99 );
+   */
+   
    
    initialize_npc_dialogue();
 	
@@ -328,6 +432,97 @@ function generateLevel()
 	game_stage.addChild( enemy9.state );
    game_stage.addChild( enemy10.state );
    game_stage.addChild( enemy11.state );
+   game_stage.addChild( enemy12.state );
+   
+   /** For later enemies
+   game_stage.addChild( enemy13.state );
+   game_stage.addChild( enemy14.state );
+   game_stage.addChild( enemy15.state );
+   game_stage.addChild( enemy16.state );
+   game_stage.addChild( enemy17.state );
+   game_stage.addChild( enemy18.state );
+   game_stage.addChild( enemy19.state );
+   game_stage.addChild( enemy20.state );
+   game_stage.addChild( enemy21.state );
+   game_stage.addChild( enemy22.state );
+   game_stage.addChild( enemy23.state );
+   game_stage.addChild( enemy24.state );
+   game_stage.addChild( enemy25.state );
+   game_stage.addChild( enemy26.state );
+   game_stage.addChild( enemy27.state );
+   game_stage.addChild( enemy28.state );
+   game_stage.addChild( enemy29.state );
+   game_stage.addChild( enemy30.state );
+   game_stage.addChild( enemy31.state );
+   game_stage.addChild( enemy32.state );
+   game_stage.addChild( enemy33.state );
+   game_stage.addChild( enemy34.state );
+   game_stage.addChild( enemy35.state );
+   game_stage.addChild( enemy36.state );
+   game_stage.addChild( enemy37.state );
+   game_stage.addChild( enemy38.state );
+   game_stage.addChild( enemy39.state );
+   game_stage.addChild( enemy40.state );
+   game_stage.addChild( enemy41.state );
+   game_stage.addChild( enemy42.state );
+   game_stage.addChild( enemy43.state );
+   game_stage.addChild( enemy44.state );
+   game_stage.addChild( enemy45.state );
+   game_stage.addChild( enemy46.state );
+   game_stage.addChild( enemy47.state );
+   game_stage.addChild( enemy48.state );
+   game_stage.addChild( enemy49.state );
+   game_stage.addChild( enemy50.state );
+   game_stage.addChild( enemy51.state );
+   game_stage.addChild( enemy52.state );
+   game_stage.addChild( enemy53.state );
+   game_stage.addChild( enemy54.state );
+   game_stage.addChild( enemy55.state );
+   game_stage.addChild( enemy56.state );
+   game_stage.addChild( enemy57.state );
+   game_stage.addChild( enemy58.state );
+   game_stage.addChild( enemy59.state );
+   game_stage.addChild( enemy60.state );
+   game_stage.addChild( enemy61.state );
+   game_stage.addChild( enemy62.state );
+   game_stage.addChild( enemy63.state );
+   game_stage.addChild( enemy64.state );
+   game_stage.addChild( enemy65.state );
+   game_stage.addChild( enemy66.state );
+   game_stage.addChild( enemy67.state );
+   game_stage.addChild( enemy68.state );
+   game_stage.addChild( enemy69.state );
+   game_stage.addChild( enemy70.state );
+   game_stage.addChild( enemy71.state );
+   game_stage.addChild( enemy72.state );
+   game_stage.addChild( enemy73.state );
+   game_stage.addChild( enemy74.state );
+   game_stage.addChild( enemy75.state );
+   game_stage.addChild( enemy76.state );
+   game_stage.addChild( enemy77.state );
+   game_stage.addChild( enemy78.state );
+   game_stage.addChild( enemy79.state );
+   game_stage.addChild( enemy80.state );
+   game_stage.addChild( enemy81.state );
+   game_stage.addChild( enemy82.state );
+   game_stage.addChild( enemy83.state );
+   game_stage.addChild( enemy84.state );
+   game_stage.addChild( enemy85.state );
+   game_stage.addChild( enemy86.state );
+   game_stage.addChild( enemy87.state );
+   game_stage.addChild( enemy88.state );
+   game_stage.addChild( enemy89.state );
+   game_stage.addChild( enemy90.state );
+   game_stage.addChild( enemy91.state );
+   game_stage.addChild( enemy92.state );
+   game_stage.addChild( enemy93.state );
+   game_stage.addChild( enemy94.state );
+   game_stage.addChild( enemy95.state );
+   game_stage.addChild( enemy96.state );
+   game_stage.addChild( enemy97.state );
+   game_stage.addChild( enemy98.state );
+   game_stage.addChild( enemy99.state );
+   */
    
 	document.addEventListener('keydown', keydownEventHandler);
 	
@@ -444,6 +639,7 @@ function generateBattleMenu()
 
 function update() 
 {
+   //document.getElementById('display').innerHTML = ("Attack: " + player.attack);
 	requestAnimationFrame( update );
 	update_camera();
 	if ( battle_active ) { 
@@ -1099,8 +1295,8 @@ function buildScreens() {
    startScreen.visible = true;
    instructScreen.visible = false;
    creditScreen.visible = false;
-   winScreen.visible = false;
-   loseScreen.visible = false;
+   gameWinScreen.visible = false;
+   gameLoseScreen.visible = false;
    statsScreen.visible = false;
 
     // Text for titles
@@ -1111,8 +1307,8 @@ function buildScreens() {
    var gameTitleText = new PIXI.Text( "RPG!", {fill : 0xFFFFFF} );
    var gameInstructTitleText = new PIXI.Text( "Instructions", {fill : 0xFFFFFF} );
    var gameCreditTitleText = new PIXI.Text( "Credits", {fill : 0xFFFFFF} );
-   var gameWinText = new PIXI.Text( "Game over!\nYou win!", {fill : 0xFFFFFF} );
-   var gameLoseText = new PIXI.Text("Game over!\nThe World has been consumed.", {fill : 0xFFFFFF} );
+   var gameWinText = new PIXI.Text( "Game over!\nYou win!", {fill : 0xFFFFFF, align: 'center'} );
+   var gameLoseText = new PIXI.Text("Game over!\nThe World has been consumed.", {fill : 0xFFFFFF, align: 'center'} );
 
    // Text for title screen options
    var gameStartText = new PIXI.Text( "Start", {fill : 0xFFFFFF} );
@@ -1121,10 +1317,8 @@ function buildScreens() {
    var gameCredBackText = new PIXI.Text( "<- Back", {fill : 0xFFFFFF} );
    var gameStatsBackText = new PIXI.Text( "Back", {fill : 0xFFFFFF} );
    var gameInstructBackText = new PIXI.Text( "<- Back", {fill : 0xFFFFFF} );
-   var gameRestartText = new PIXI.Text( "Play again", {fill : 0xFFFFFF} );
-   var gameReturnTitleText = new PIXI.Text( "Back to title screen", {fill : 0xFFFFFF} );
+   var gameWinRestartText = new PIXI.Text( "Play again", {fill : 0xFFFFFF} );
    var gameLoseRestartText = new PIXI.Text( "Play again", {fill : 0xFFFFFF} );
-   var gameLoseReturnTitleText = new PIXI.Text( "Back to title screen", {fill : 0xFFFFFF} );
 
    
    // Adds regular text -----------------------------------------------------
@@ -1134,7 +1328,8 @@ function buildScreens() {
                                          "many people as you can in order to\n" + 
                                          "gather as much info as possible!\n\n" + 
                                          "Some townsfolk can even help you\n" + 
-                                         "by making you stronger!", {fill : 0xFFFFFF} );
+                                         "by making you stronger! Walk up to\n" +
+                                         "some and press Enter to talk to them.", {fill : 0xFFFFFF} );
    var gameCredDesc = new PIXI.Text( "Authors: \nJohn Jacobelli\nJesse Rodriguez\nTyler "+
                                      "Pehringer\n\nRenderer used: PixiJS", {fill : 0xFFFFFF} );
 
@@ -1146,10 +1341,8 @@ function buildScreens() {
    gameCredText.interactive = true;
    gameCredBackText.interactive = true;
    gameInstructBackText.interactive = true;
-   gameRestartText.interactive = true;
-   gameReturnTitleText.interactive = true;
+   gameWinRestartText.interactive = true;
    gameLoseRestartText.interactive = true;
-   gameLoseReturnTitleText.interactive = true;
 
    
    // Declares interactable text functions
@@ -1186,19 +1379,9 @@ function buildScreens() {
    gameInstructBackText.click = function(event) { startScreen.visible = true;
                                                   instructScreen.visible = false; }
                                                   
-   gameRestartText.click = function(event) { winScreen.visible = false;
-                                             loseScreen.visible = false; }
-                                             
-   gameReturnTitleText.click = function(event) { startScreen.visible = true;
-                                                 winScreen.visible = false;
-                                                 loseScreen.visible = false; }
-                                                 
-   gameLoseRestartText.click = function(event) { winScreen.visible = false;
-                                                 loseScreen.visible = false; }
-                                             
-   gameLoseReturnTitleText.click = function(event) { startScreen.visible = true;
-                                                     winScreen.visible = false;
-                                                     loseScreen.visible = false;  }
+   gameWinRestartText.click = function(event) { location.reload(); }
+   
+   gameLoseRestartText.click = function(event) { location.reload(); }
     
    
    // Create background for screens screen
@@ -1215,8 +1398,8 @@ function buildScreens() {
    startScreen.addChild( graphics1 );
    instructScreen.addChild( graphics2 );
    creditScreen.addChild( graphics3 );
-   winScreen.addChild( graphics4 );
-   loseScreen.addChild( graphics5 );
+   gameWinScreen.addChild( graphics4 );
+   gameLoseScreen.addChild( graphics5 );
    statsScreen.addChild( graphics6 );
 
    // Add text to screens
@@ -1230,12 +1413,10 @@ function buildScreens() {
    creditScreen.addChild( gameCredBackText );
    creditScreen.addChild( gameCreditTitleText );
    creditScreen.addChild( gameCredDesc );
-   winScreen.addChild( gameWinText );
-   winScreen.addChild( gameRestartText );
-   winScreen.addChild( gameReturnTitleText );
-   loseScreen.addChild( gameLoseText );
-   loseScreen.addChild( gameLoseRestartText );
-   loseScreen.addChild( gameLoseReturnTitleText );
+   gameWinScreen.addChild( gameWinRestartText );
+   gameWinScreen.addChild( gameWinText );
+   gameLoseScreen.addChild( gameLoseRestartText );
+   gameLoseScreen.addChild( gameLoseText );
    statsScreen.addChild( gameStatsBackText );
    statsScreen.addChild( playerAttackText );
    statsScreen.addChild( playerHealthText );
@@ -1254,10 +1435,9 @@ function buildScreens() {
    gameCredBackText.anchor.set( 1 );
    gameCreditTitleText.anchor.set( .5 );
    gameWinText.anchor.set( .5 );
-   gameRestartText.anchor.set( .5 );
-   gameReturnTitleText.anchor.set( .5 );
+   gameLoseText.anchor.set( .5 );
+   gameWinRestartText.anchor.set( .5 );
    gameLoseRestartText.anchor.set( .5 );
-   gameLoseReturnTitleText.anchor.set( .5 );
 
    // Place Text
    gameStatsText.x = GAME_WIDTH - 15; gameStatsText.y = GAME_HEIGHT - 15;
@@ -1276,18 +1456,16 @@ function buildScreens() {
    gameInstructBackText.x = GAME_WIDTH - 25; gameInstructBackText.y = GAME_WIDTH - 25;
    gameCredBackText.x = GAME_WIDTH - 25; gameCredBackText.y = GAME_WIDTH - 25;
    gameWinText.x = GAME_WIDTH/2; gameWinText.y = GAME_HEIGHT/3 + 10;
-   gameLoseText.x = GAME_WIDTH/8; gameLoseText.y = GAME_HEIGHT/3 + 10;
-   gameRestartText.x = GAME_WIDTH/2; gameRestartText.y = GAME_HEIGHT/2 + 50;
-   gameReturnTitleText.x = GAME_WIDTH/2; gameReturnTitleText.y = GAME_HEIGHT/2 + 100;
-   gameLoseRestartText.x = GAME_WIDTH/2; gameLoseRestartText.y = GAME_HEIGHT/2 + 50;
-   gameLoseReturnTitleText.x = GAME_WIDTH/2; gameLoseReturnTitleText.y = GAME_HEIGHT/2 + 100;
+   gameLoseText.x = GAME_WIDTH/2; gameLoseText.y = GAME_HEIGHT/3 + 10;
+   gameWinRestartText.x = GAME_WIDTH/2; gameWinRestartText.y = GAME_HEIGHT/3;
+   gameLoseRestartText.x = GAME_WIDTH/2; gameLoseRestartText.y = 2 * GAME_HEIGHT/3;
    
    // Add screens to stage
    master_stage.addChild( startScreen );
    master_stage.addChild( instructScreen );
    master_stage.addChild( creditScreen );
-   master_stage.addChild( winScreen );
-   master_stage.addChild( loseScreen );
+   master_stage.addChild( gameWinScreen );
+   master_stage.addChild( gameLoseScreen );
    master_stage.addChild( statsScreen );
 }
 
@@ -1394,13 +1572,14 @@ function enemyAttack( foe ) {
 		}
 
 		if ( player.health <= 0 ) {
-			//alert("You have fallen in battle. ;-;");
+			alert("You have fallen in battle. ;-;");
 			if ( player.armor <= 1 ) {
 				game_stage.removeChild( player.state );
-				
 				player.state.stop();
 				player.is_alive = false;
 				endBattle( foe );
+            
+            gameLoseScreen.visible = true;
 			}
 			
          player.armor--;
@@ -1412,23 +1591,29 @@ function enemyAttack( foe ) {
 	Helper function that handles skill action in combat
 */
 function skill( foe ) {
-	if( player.speed > foe.speed ) {
-			if(!player.is_boosted) {
-			player.is_boosted = true;
-			player.attack *= 2;
-	}
+	if( player.speed > foe.speed ) 
+   {
+      if( !player.is_boosted ) 
+      {
+         player.is_boosted = true;
+         player.attack *= 2;
+      }
 	
-		if ( player.is_alive && foe.is_alive ) {
+		if ( player.is_alive && foe.is_alive ) 
+      {
 			enemyAttack( foe ); //Pass in enemy
 		}
 	}
 
-	else {
-		if ( player.is_alive && foe.is_alive ) {
+	else 
+   {
+		if ( player.is_alive && foe.is_alive ) 
+      {
 			enemyAttack( foe ); //Pass in enemy
 		}
 	
-		if(!player.is_boosted) {
+		if( !player.is_boosted ) 
+      {
 			player.is_boosted = true;
 			player.attack *= 2;
 		}
@@ -1468,8 +1653,19 @@ function run( foe ) {
 function endBattle ( foe ) {
 	battle_active = false;
 	foe.is_hit = false;
-	player.is_boosted = false;
-	player.attack += 1;
+	
+   if( player.is_boosted )
+   {
+      player.is_boosted = false;
+      player.attack /= 2;
+      
+   }
+   
+	if( foe.health <= 0 )
+   {
+      player.attack += 1;
+   }
+   
 	moveHand(hand.position.x, menu_text.position.y + 
                            menu_text.height - 10);
 	mode = RUN;
